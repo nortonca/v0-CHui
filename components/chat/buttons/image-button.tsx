@@ -3,15 +3,16 @@
 import { Button } from "@/components/ui/button"
 import { ImageIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { ActiveButton } from "../types"
 
+// Update the interface
 interface ImageButtonProps {
-  activeButton: ActiveButton
-  toggleButton: (button: ActiveButton) => void
+  isActive: boolean
+  toggleButton: () => void
   isStreaming: boolean
 }
 
-export default function ImageButton({ activeButton, toggleButton, isStreaming }: ImageButtonProps) {
+// Update the component
+export default function ImageButton({ isActive, toggleButton, isStreaming }: ImageButtonProps) {
   return (
     <Button
       type="button"
@@ -19,12 +20,12 @@ export default function ImageButton({ activeButton, toggleButton, isStreaming }:
       size="icon"
       className={cn(
         "rounded-full h-8 w-8 flex-shrink-0 border-gray-200 p-0 transition-colors",
-        activeButton === "image" && "bg-gray-100 border-gray-300",
+        isActive && "bg-primary/10 border-primary/20",
       )}
-      onClick={() => toggleButton("image")}
+      onClick={toggleButton}
       disabled={isStreaming}
     >
-      <ImageIcon className={cn("h-4 w-4 text-gray-500", activeButton === "image" && "text-gray-700")} />
+      <ImageIcon className={cn("h-4 w-4 text-gray-500", isActive && "text-primary")} />
       <span className="sr-only">Image</span>
     </Button>
   )

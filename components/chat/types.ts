@@ -1,4 +1,10 @@
-export type ActiveButton = "none" | "add" | "deepSearch" | "think" | "image"
+export interface ActiveButtonState {
+  add: boolean
+  deepSearch: boolean
+  think: boolean
+  image: boolean
+  browser: boolean
+}
 export type MessageType = "user" | "system"
 
 export interface Message {

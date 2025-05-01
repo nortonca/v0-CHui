@@ -54,7 +54,7 @@ export default function ImageUpload({ images, onRemoveImage, onAddImages, isVisi
     <div
       className={cn(
         "w-full p-4 rounded-lg transition-all",
-        isDragging ? "bg-gray-100 border-2 border-dashed border-gray-300" : "bg-transparent",
+        isDragging ? "bg-primary/5 border-2 border-dashed border-primary/30" : "bg-transparent",
       )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -89,18 +89,18 @@ export default function ImageUpload({ images, onRemoveImage, onAddImages, isVisi
 
           <button
             onClick={triggerFileInput}
-            className="w-20 h-20 flex items-center justify-center border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100"
+            className="w-20 h-20 flex items-center justify-center border border-primary/20 rounded-lg bg-primary/5 hover:bg-primary/10 text-primary"
           >
-            <span className="text-2xl text-gray-400">+</span>
+            <span className="text-2xl">+</span>
           </button>
         </div>
       ) : (
         <div
           onClick={triggerFileInput}
-          className="w-full py-6 flex flex-col items-center justify-center border border-gray-200 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 cursor-pointer"
+          className="w-full py-6 flex flex-col items-center justify-center border border-primary/20 border-dashed rounded-lg bg-primary/5 hover:bg-primary/10 cursor-pointer"
         >
-          <p className="text-gray-500 mb-1">Drop images here or click to upload</p>
-          <p className="text-gray-400 text-sm">PNG, JPG, GIF up to 10MB</p>
+          <p className="text-gray-700 mb-1">Drop images here or click to upload</p>
+          <p className="text-gray-500 text-sm">PNG, JPG, GIF up to 10MB</p>
         </div>
       )}
     </div>

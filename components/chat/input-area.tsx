@@ -2,9 +2,9 @@
 
 import type React from "react"
 
-import { useState, useRef } from "react"
+import { useRef } from "react"
 import { cn } from "@/lib/utils"
-import type { ActiveButton, UploadedImage } from "./types"
+import type { ActiveButtonState, UploadedImage } from "./types"
 import ImageUpload from "./image-upload"
 import TextareaInput from "./textarea-input"
 import ImageButton from "./buttons/image-button"
@@ -15,15 +15,16 @@ import SendButton from "./buttons/send-button"
 
 interface InputAreaProps {
   inputValue: string
-  setInputValue: (value: string) => void
+  setInputValue: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
   handleSubmit: (e: React.FormEvent) => void
   isStreaming: boolean
   isMobile: boolean
-  activeButton: ActiveButton
-  setActiveButton: (button: ActiveButton) => void
+  activeButtons: ActiveButtonState
+  setActiveButtons: (buttons: ActiveButtonState) => void
   textareaRef: React.RefObject<HTMLTextAreaElement>
   uploadedImages: UploadedImage[]
   setUploadedImages: (images: UploadedImage[]) => void
+  hasTyped: boolean
 }
 
 export default function InputArea({
@@ -32,13 +33,13 @@ export default function InputArea({
   handleSubmit,
   isStreaming,
   isMobile,
-  activeButton,
-  setActiveButton,
+  activeButtons,
+  setActiveButtons,
   textareaRef,
   uploadedImages,
   setUploadedImages,
+  hasTyped,
 }: InputAreaProps) {
-  const [hasTyped, setHasTyped] = useState(false)
   const inputContainerRef = useRef<HTMLDivElement>(null)
   const selectionStateRef = useRef<{ start: number | null; end: number | null }>({ start: null, end: null })
 
@@ -85,28 +86,6 @@ export default function InputArea({
     }
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value
-
-    // Only allow input changes when not streaming
-    if (!isStreaming) {
-      setInputValue(newValue)
-
-      if (newValue.trim() !== "" && !hasTyped) {
-        setHasTyped(true)
-      } else if (newValue.trim() === "" && hasTyped) {
-        setHasTyped(false)
-      }
-
-      const textarea = textareaRef.current
-      if (textarea) {
-        textarea.style.height = "auto"
-        const newHeight = Math.max(24, Math.min(textarea.scrollHeight, 160))
-        textarea.style.height = `${newHeight}px`
-      }
-    }
-  }
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     // Handle Cmd+Enter on both mobile and desktop
     if (!isStreaming && e.key === "Enter" && e.metaKey) {
@@ -122,12 +101,16 @@ export default function InputArea({
     }
   }
 
-  const toggleButton = (button: ActiveButton) => {
+  // Update the toggleButton function to toggle individual buttons
+  const toggleButton = (button: keyof ActiveButtonState) => {
     if (!isStreaming) {
       // Save the current selection state before toggling
       saveSelectionState()
 
-      setActiveButton((prev) => (prev === button ? "none" : button))
+      setActiveButtons((prev) => ({
+        ...prev,
+        [button]: !prev[button],
+      }))
 
       // Restore the selection state after toggling
       setTimeout(() => {
@@ -175,7 +158,7 @@ export default function InputArea({
           images={uploadedImages}
           onRemoveImage={handleRemoveImage}
           onAddImages={handleAddImages}
-          isVisible={activeButton === "image"}
+          isVisible={activeButtons.image}
         />
 
         <div
@@ -190,7 +173,7 @@ export default function InputArea({
             <TextareaInput
               textareaRef={textareaRef}
               inputValue={inputValue}
-              handleInputChange={handleInputChange}
+              handleInputChange={setInputValue}
               handleKeyDown={handleKeyDown}
               isStreaming={isStreaming}
               isMobile={isMobile}
@@ -200,24 +183,31 @@ export default function InputArea({
           <div className="absolute bottom-3 left-3 right-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <ImageButton activeButton={activeButton} toggleButton={toggleButton} isStreaming={isStreaming} />
+                {/* Update the button components to use the new activeButtons state */}
+                <ImageButton
+                  isActive={activeButtons.image}
+                  toggleButton={() => toggleButton("image")}
+                  isStreaming={isStreaming}
+                />
 
-                <SearchButton activeButton={activeButton} toggleButton={toggleButton} isStreaming={isStreaming} />
+                <SearchButton
+                  isActive={activeButtons.deepSearch}
+                  toggleButton={() => toggleButton("deepSearch")}
+                  isStreaming={isStreaming}
+                />
 
                 <ThinkButton
-                  activeButton={activeButton}
-                  toggleButton={toggleButton}
+                  isActive={activeButtons.think}
+                  toggleButton={() => toggleButton("think")}
                   isStreaming={isStreaming}
-                  setActiveButton={setActiveButton}
-                  focusTextarea={focusTextarea}
                 />
               </div>
 
               <div className="flex items-center space-x-2">
-                <MicrophoneButton isStreaming={isStreaming} setInputValue={setInputValue} setHasTyped={setHasTyped} />
+                <MicrophoneButton isStreaming={isStreaming} setInputValue={setInputValue} setHasTyped={() => {}} />
 
                 <SendButton
-                  hasTyped={hasTyped}
+                  hasTyped={hasTyped || inputValue.trim().length > 0}
                   inputValue={inputValue}
                   isStreaming={isStreaming}
                   uploadedImages={uploadedImages}

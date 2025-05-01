@@ -18,7 +18,7 @@ export default function SendButton({ hasTyped, inputValue, isStreaming, uploaded
       size="icon"
       className={cn(
         "rounded-full h-8 w-8 border-0 flex-shrink-0 transition-all duration-200",
-        hasTyped || uploadedImages.length > 0 ? "bg-black scale-110" : "bg-gray-200",
+        hasTyped || uploadedImages.length > 0 ? "bg-primary text-white scale-110" : "bg-gray-200",
       )}
       disabled={(!inputValue.trim() && uploadedImages.length === 0) || isStreaming}
     >
