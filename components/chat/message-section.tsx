@@ -12,7 +12,6 @@ interface MessageSectionProps {
   viewportHeight: number
   isLastSection: boolean
   newSectionRef: React.RefObject<HTMLDivElement>
-  thinking: string | null
 }
 
 export default function MessageSectionComponent({
@@ -23,7 +22,6 @@ export default function MessageSectionComponent({
   viewportHeight,
   isLastSection,
   newSectionRef,
-  thinking,
 }: MessageSectionProps) {
   // Determine if a section should have fixed height (only for sections after the first)
   const shouldApplyHeight = (sectionIndex: number) => {
@@ -48,7 +46,6 @@ export default function MessageSectionComponent({
               streamingMessageId={streamingMessageId}
               streamingWords={streamingWords}
               completedMessages={completedMessages}
-              thinking={thinking}
             />
           ))}
         </div>
@@ -63,7 +60,6 @@ export default function MessageSectionComponent({
               streamingMessageId={streamingMessageId}
               streamingWords={streamingWords}
               completedMessages={completedMessages}
-              thinking={thinking}
             />
           ))}
         </div>

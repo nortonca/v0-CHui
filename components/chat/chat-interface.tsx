@@ -5,13 +5,16 @@ import type React from "react"
 import "ios-vibrator-pro-max"
 
 import { useState, useRef, useEffect } from "react"
-import type { MessageSection, StreamingWord, UploadedImage, ActiveButtonState } from "./types"
+import type { Message, MessageSection, StreamingWord, UploadedImage, ActiveButtonState } from "./types"
+import { getAIResponse } from "./utils"
 import ChatHeader from "./chat-header"
 import MessageSectionComponent from "./message-section"
 import InputArea from "./input-area"
-import { useChat } from "ai/react"
 
 export default function ChatInterface() {
+  const [inputValue, setInputValue] = useState("")
+  const chatContainerRef = useRef<HTMLDivElement>(null)
+  const newSectionRef = useRef<HTMLDivElement>(null)
   const [activeButtons, setActiveButtons] = useState<ActiveButtonState>({
     add: false,
     deepSearch: false,
@@ -20,68 +23,19 @@ export default function ChatInterface() {
     browser: false,
   })
   const [isMobile, setIsMobile] = useState(false)
+  const [messages, setMessages] = useState<Message[]>([])
   const [messageSections, setMessageSections] = useState<MessageSection[]>([])
+  const [isStreaming, setIsStreaming] = useState(false)
   const [streamingWords, setStreamingWords] = useState<StreamingWord[]>([])
   const [streamingMessageId, setStreamingMessageId] = useState<string | null>(null)
   const [viewportHeight, setViewportHeight] = useState(0)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
   const [completedMessages, setCompletedMessages] = useState<Set<string>>(new Set())
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null)
-  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([])
-  const [thinking, setThinking] = useState<string | null>(null)
-  const [inputValue, setInputValue] = useState("")
-  const [hasTyped, setHasTyped] = useState(false)
-
-  const chatContainerRef = useRef<HTMLDivElement>(null)
-  const newSectionRef = useRef<HTMLDivElement>(null)
   const shouldFocusAfterStreamingRef = useRef(false)
   const mainContainerRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  // Use the AI SDK's useChat hook
-  const { messages, isLoading, append, setMessages } = useChat({
-    api: "/api/chat",
-    onFinish: () => {
-      setThinking(null)
-      setStreamingMessageId(null)
-      setStreamingWords([])
-
-      // Add vibration when streaming ends
-      navigator.vibrate(50)
-
-      // Add to completed messages set to prevent re-animation
-      if (streamingMessageId) {
-        setCompletedMessages((prev) => new Set(prev).add(streamingMessageId))
-      }
-    },
-    body: {
-      useSearch: activeButtons.deepSearch,
-      useThinking: activeButtons.think,
-    },
-    onResponse: (response) => {
-      // Add vibration when streaming begins
-      navigator.vibrate(50)
-    },
-    onMessage: (message) => {
-      // Check if this is a thinking message
-      if (message.thinking) {
-        setThinking(message.thinking)
-        return
-      }
-
-      // Handle regular message chunks
-      if (message.text) {
-        // Add to streaming words for animation
-        setStreamingWords((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            text: message.text,
-          },
-        ])
-      }
-    },
-  })
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([])
 
   // Check if device is mobile and get viewport height
   useEffect(() => {
@@ -130,17 +84,8 @@ export default function ChatInterface() {
       sectionIndex: 0,
     }
 
-    messages.forEach((message, index) => {
-      // Convert AI SDK message to our internal message format
-      const internalMessage = {
-        id: `${message.role}-${index}`,
-        content: message.content,
-        type: message.role === "user" ? "user" : "system",
-        completed: message.role === "assistant",
-        newSection: index > 0 && messages[index - 1].role === "assistant" && message.role === "user",
-      }
-
-      if (internalMessage.newSection) {
+    messages.forEach((message) => {
+      if (message.newSection) {
         // Start a new section
         if (currentSection.messages.length > 0) {
           // Mark previous section as inactive
@@ -154,7 +99,7 @@ export default function ChatInterface() {
         const newSectionId = `section-${Date.now()}-${sections.length}`
         currentSection = {
           id: newSectionId,
-          messages: [internalMessage],
+          messages: [message],
           isNewSection: true,
           isActive: true,
           sectionIndex: sections.length,
@@ -164,7 +109,7 @@ export default function ChatInterface() {
         setActiveSectionId(newSectionId)
       } else {
         // Add to current section
-        currentSection.messages.push(internalMessage)
+        currentSection.messages.push(message)
       }
     })
 
@@ -195,81 +140,137 @@ export default function ChatInterface() {
 
   // Set focus back to textarea after streaming ends (only on desktop)
   useEffect(() => {
-    if (!isLoading && shouldFocusAfterStreamingRef.current && !isMobile) {
+    if (!isStreaming && shouldFocusAfterStreamingRef.current && !isMobile) {
       if (textareaRef.current) {
         textareaRef.current.focus()
       }
       shouldFocusAfterStreamingRef.current = false
     }
-  }, [isLoading, isMobile])
+  }, [isStreaming, isMobile])
 
   // Reset uploaded images when active button changes
   useEffect(() => {
     if (activeButtons.image === false) {
       // Don't clear images if we're submitting the form
-      if (!isLoading) {
+      if (!isStreaming) {
         // setUploadedImages([])
       }
     }
-  }, [activeButtons.image, isLoading])
+  }, [activeButtons.image, isStreaming])
 
-  // Handle input change
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value
-    setInputValue(newValue)
+  const simulateTextStreaming = async (text: string) => {
+    // Split text into words
+    const words = text.split(" ")
+    let currentIndex = 0
+    setStreamingWords([])
+    setIsStreaming(true)
 
-    if (newValue.trim() !== "" && !hasTyped) {
-      setHasTyped(true)
-    } else if (newValue.trim() === "" && hasTyped) {
-      setHasTyped(false)
-    }
+    return new Promise<void>((resolve) => {
+      const streamInterval = setInterval(() => {
+        if (currentIndex < words.length) {
+          // Add a few words at a time
+          const nextIndex = Math.min(currentIndex + 2, words.length)
+          const newWords = words.slice(currentIndex, nextIndex)
 
-    const textarea = textareaRef.current
-    if (textarea) {
-      textarea.style.height = "auto"
-      const newHeight = Math.max(24, Math.min(textarea.scrollHeight, 160))
-      textarea.style.height = `${newHeight}px`
-    }
+          setStreamingWords((prev) => [
+            ...prev,
+            {
+              id: Date.now() + currentIndex,
+              text: newWords.join(" ") + " ",
+            },
+          ])
+
+          currentIndex = nextIndex
+        } else {
+          clearInterval(streamInterval)
+          resolve()
+        }
+      }, 40)
+    })
   }
 
-  // Custom submit handler that wraps the AI SDK's submit
+  const simulateAIResponse = async (userMessage: string) => {
+    const response = getAIResponse(userMessage)
+
+    // Create a new message with empty content
+    const messageId = Date.now().toString()
+    setStreamingMessageId(messageId)
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: messageId,
+        content: "",
+        type: "system",
+      },
+    ])
+
+    // Add a delay before the second vibration
+    setTimeout(() => {
+      // Add vibration when streaming begins
+      navigator.vibrate(50)
+    }, 200) // 200ms delay to make it distinct from the first vibration
+
+    // Stream the text
+    await simulateTextStreaming(response)
+
+    // Update with complete message
+    setMessages((prev) =>
+      prev.map((msg) => (msg.id === messageId ? { ...msg, content: response, completed: true } : msg)),
+    )
+
+    // Add to completed messages set to prevent re-animation
+    setCompletedMessages((prev) => new Set(prev).add(messageId))
+
+    // Add vibration when streaming ends
+    navigator.vibrate(50)
+
+    // Reset streaming state
+    setStreamingWords([])
+    setStreamingMessageId(null)
+    setIsStreaming(false)
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-
-    if ((inputValue.trim() || uploadedImages.length > 0) && !isLoading) {
+    if ((inputValue.trim() || uploadedImages.length > 0) && !isStreaming) {
       // Add vibration when message is submitted
       navigator.vibrate(50)
 
-      // Set the streaming message ID for the upcoming assistant message
-      setStreamingMessageId(`assistant-${messages.length + 1}`)
+      const userMessage = inputValue.trim()
 
-      // Reset streaming words
-      setStreamingWords([])
+      // Add as a new section if messages already exist
+      const shouldAddNewSection = messages.length > 0
 
-      // Reset active buttons
+      const newUserMessage = {
+        id: `user-${Date.now()}`,
+        content: userMessage,
+        type: "user" as const,
+        newSection: shouldAddNewSection,
+        images: uploadedImages.length > 0 ? [...uploadedImages] : undefined,
+      }
+
+      // Reset input before starting the AI response
+      setInputValue("")
       setActiveButtons({
         add: false,
-        deepSearch: activeButtons.deepSearch, // Keep search state
-        think: activeButtons.think, // Keep think state
+        deepSearch: false,
+        think: false,
         image: false,
         browser: false,
       })
-
-      // Submit the message using the AI SDK
-      append({
-        role: "user",
-        content: inputValue,
-      })
-
-      // Clear input and uploaded images
-      setInputValue("")
-      setHasTyped(false)
       setUploadedImages([])
+
+      // Add the message after resetting input
+      setMessages((prev) => [...prev, newUserMessage])
 
       // On mobile, blur the textarea to dismiss the keyboard
       if (isMobile && textareaRef.current) {
         textareaRef.current.blur()
       }
+
+      // Start AI response
+      simulateAIResponse(userMessage)
     }
   }
 
@@ -293,7 +294,6 @@ export default function ChatInterface() {
               viewportHeight={viewportHeight}
               isLastSection={sectionIndex === messageSections.length - 1}
               newSectionRef={newSectionRef}
-              thinking={thinking}
             />
           ))}
           <div ref={messagesEndRef} />
@@ -302,16 +302,15 @@ export default function ChatInterface() {
 
       <InputArea
         inputValue={inputValue}
-        setInputValue={handleInputChange}
+        setInputValue={setInputValue}
         handleSubmit={handleSubmit}
-        isStreaming={isLoading}
+        isStreaming={isStreaming}
         isMobile={isMobile}
         activeButtons={activeButtons}
         setActiveButtons={setActiveButtons}
         textareaRef={textareaRef}
         uploadedImages={uploadedImages}
         setUploadedImages={setUploadedImages}
-        hasTyped={hasTyped}
       />
     </div>
   )

@@ -8,7 +8,6 @@ interface MessageProps {
   streamingMessageId: string | null
   streamingWords: StreamingWord[]
   completedMessages: Set<string>
-  thinking: string | null
 }
 
 export default function MessageComponent({
@@ -16,10 +15,8 @@ export default function MessageComponent({
   streamingMessageId,
   streamingWords,
   completedMessages,
-  thinking,
 }: MessageProps) {
   const isCompleted = completedMessages.has(message.id)
-  const isStreaming = message.id === streamingMessageId
 
   return (
     <div className={cn("flex flex-col", message.type === "user" ? "items-end" : "items-start")}>
@@ -37,14 +34,6 @@ export default function MessageComponent({
         </div>
       )}
 
-      {/* Display thinking if enabled and this is the streaming message */}
-      {isStreaming && thinking && message.type === "system" && (
-        <div className="max-w-[80%] px-4 py-2 mb-2 rounded-2xl bg-primary/5 text-gray-600 italic">
-          <p className="text-sm font-medium mb-1">Thinking:</p>
-          <p className="text-sm">{thinking}</p>
-        </div>
-      )}
-
       <div
         className={cn(
           "max-w-[80%] px-4 py-2 rounded-2xl",
@@ -52,15 +41,15 @@ export default function MessageComponent({
         )}
       >
         {/* For user messages or completed system messages, render without animation */}
-        {message.content && !isStreaming && (
+        {message.content && (
           <span className={message.type === "system" && !isCompleted ? "animate-fade-in" : ""}>{message.content}</span>
         )}
 
         {/* For streaming messages, render with animation */}
-        {isStreaming && (
+        {message.id === streamingMessageId && (
           <span className="inline">
-            {streamingWords.map((word, index) => (
-              <span key={`${word.id}-${index}`} className="animate-fade-in inline">
+            {streamingWords.map((word) => (
+              <span key={word.id} className="animate-fade-in inline">
                 {word.text}
               </span>
             ))}

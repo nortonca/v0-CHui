@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Mic } from "lucide-react"
@@ -9,7 +7,7 @@ import { cn } from "@/lib/utils"
 
 interface MicrophoneButtonProps {
   isStreaming: boolean
-  setInputValue: (value: React.ChangeEvent<HTMLTextAreaElement>) => void
+  setInputValue: (value: string) => void
   setHasTyped: (value: boolean) => void
 }
 
@@ -28,16 +26,7 @@ export default function MicrophoneButton({ isStreaming, setInputValue, setHasTyp
       setTimeout(() => {
         setIsRecording(false)
         // Simulate adding transcribed text
-        const simulatedText = "This is simulated voice input."
-
-        // Create a mock event to match the expected interface
-        const mockEvent = {
-          target: {
-            value: simulatedText,
-          },
-        } as React.ChangeEvent<HTMLTextAreaElement>
-
-        setInputValue(mockEvent)
+        setInputValue((prev) => prev + (prev ? " " : "") + "This is simulated voice input.")
         setHasTyped(true)
       }, 3000)
     }

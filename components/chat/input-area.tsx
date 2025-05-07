@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useRef } from "react"
+import { useState, useRef } from "react"
 import { cn } from "@/lib/utils"
 import type { ActiveButtonState, UploadedImage } from "./types"
 import ImageUpload from "./image-upload"
@@ -15,7 +15,7 @@ import SendButton from "./buttons/send-button"
 
 interface InputAreaProps {
   inputValue: string
-  setInputValue: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
+  setInputValue: (value: string) => void
   handleSubmit: (e: React.FormEvent) => void
   isStreaming: boolean
   isMobile: boolean
@@ -24,7 +24,6 @@ interface InputAreaProps {
   textareaRef: React.RefObject<HTMLTextAreaElement>
   uploadedImages: UploadedImage[]
   setUploadedImages: (images: UploadedImage[]) => void
-  hasTyped: boolean
 }
 
 export default function InputArea({
@@ -38,8 +37,8 @@ export default function InputArea({
   textareaRef,
   uploadedImages,
   setUploadedImages,
-  hasTyped,
 }: InputAreaProps) {
+  const [hasTyped, setHasTyped] = useState(false)
   const inputContainerRef = useRef<HTMLDivElement>(null)
   const selectionStateRef = useRef<{ start: number | null; end: number | null }>({ start: null, end: null })
 
@@ -82,6 +81,28 @@ export default function InputArea({
     ) {
       if (textareaRef.current) {
         textareaRef.current.focus()
+      }
+    }
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value
+
+    // Only allow input changes when not streaming
+    if (!isStreaming) {
+      setInputValue(newValue)
+
+      if (newValue.trim() !== "" && !hasTyped) {
+        setHasTyped(true)
+      } else if (newValue.trim() === "" && hasTyped) {
+        setHasTyped(false)
+      }
+
+      const textarea = textareaRef.current
+      if (textarea) {
+        textarea.style.height = "auto"
+        const newHeight = Math.max(24, Math.min(textarea.scrollHeight, 160))
+        textarea.style.height = `${newHeight}px`
       }
     }
   }
@@ -173,7 +194,7 @@ export default function InputArea({
             <TextareaInput
               textareaRef={textareaRef}
               inputValue={inputValue}
-              handleInputChange={setInputValue}
+              handleInputChange={handleInputChange}
               handleKeyDown={handleKeyDown}
               isStreaming={isStreaming}
               isMobile={isMobile}
@@ -204,10 +225,10 @@ export default function InputArea({
               </div>
 
               <div className="flex items-center space-x-2">
-                <MicrophoneButton isStreaming={isStreaming} setInputValue={setInputValue} setHasTyped={() => {}} />
+                <MicrophoneButton isStreaming={isStreaming} setInputValue={setInputValue} setHasTyped={setHasTyped} />
 
                 <SendButton
-                  hasTyped={hasTyped || inputValue.trim().length > 0}
+                  hasTyped={hasTyped}
                   inputValue={inputValue}
                   isStreaming={isStreaming}
                   uploadedImages={uploadedImages}
