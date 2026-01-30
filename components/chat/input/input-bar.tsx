@@ -144,6 +144,7 @@ export default function InputBar({
   }
 
   const handleThinkLevelChange = (level: "off" | "on" | "deep") => {
+    // Type matches ThinkLevel from think-button.tsx
     saveSelectionState()
     setActiveButtons((prev) => ({ ...prev, thinkLevel: level }))
     setTimeout(() => restoreSelectionState(), 0)

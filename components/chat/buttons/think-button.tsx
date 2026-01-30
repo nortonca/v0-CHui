@@ -4,17 +4,18 @@ import { useState, useRef, useEffect } from "react"
 import { Lightbulb } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+export type ThinkLevel = "off" | "on" | "deep"
+
 interface ThinkButtonProps {
-  thinkLevel: "off" | "low" | "medium" | "high"
-  onLevelChange: (level: "off" | "low" | "medium" | "high") => void
+  thinkLevel: ThinkLevel
+  onLevelChange: (level: ThinkLevel) => void
   isStreaming: boolean
 }
 
 const THINK_LEVELS = [
-  { id: "off" as const, name: "Off", description: "No reasoning" },
-  { id: "low" as const, name: "Low", description: "Basic reasoning" },
-  { id: "medium" as const, name: "Medium", description: "Balanced reasoning" },
-  { id: "high" as const, name: "High", description: "Deep reasoning" },
+  { id: "off" as const, name: "Off", description: "No extended thinking" },
+  { id: "on" as const, name: "On", description: "Basic reasoning" },
+  { id: "deep" as const, name: "Deep", description: "Extended thinking" },
 ]
 
 export default function ThinkButton({ thinkLevel, onLevelChange, isStreaming }: ThinkButtonProps) {

@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils"
 import { Brain, ListTodo, BookOpen, History } from "lucide-react"
 import ImageButton from "../buttons/image-button"
-import ThinkButton from "../buttons/think-button"
+import ThinkButton, { type ThinkLevel } from "../buttons/think-button"
 import ToolsButton from "../buttons/tools-button"
 import CollaborationModeToggle, { type CollaborationMode } from "../collaboration-mode"
 import type { ActiveButtonState } from "../types"
@@ -21,7 +21,7 @@ interface InputControlsProps {
   checkpointsCount: number
   collaborationMode: CollaborationMode
   onToggleButton: (button: keyof ActiveButtonState) => void
-  onThinkLevelChange: (level: "off" | "on" | "deep") => void
+  onThinkLevelChange: (level: ThinkLevel) => void
   onToolsChange: (tools: string[]) => void
   onTogglePanel: (panel: "memory" | "task" | "playbooks" | "checkpoints") => void
   onCollaborationModeChange: (mode: CollaborationMode) => void

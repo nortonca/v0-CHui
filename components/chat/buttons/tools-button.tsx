@@ -46,23 +46,14 @@ export default function ToolsButton({ selectedTools, onToolsChange, isStreaming 
   }
 
   return (
-    <div 
-      className="relative" 
-      ref={dropdownRef}
-      onClick={(e) => e.stopPropagation()}
-      onMouseDown={(e) => e.stopPropagation()}
-    >
+    <div className="relative" ref={dropdownRef}>
       <button
         type="button"
         className={cn(
           "rounded-full h-8 px-3 flex items-center border border-border gap-1.5 transition-colors bg-background",
           selectedTools.length > 0 && "bg-primary/10 border-primary/20"
         )}
-        onClick={(e) => {
-          e.stopPropagation()
-          setIsOpen(!isOpen)
-        }}
-        onMouseDown={(e) => e.stopPropagation()}
+        onClick={() => setIsOpen(!isOpen)}
         disabled={isStreaming}
       >
         <Wrench className={cn("h-4 w-4 text-muted-foreground", selectedTools.length > 0 && "text-primary")} />
@@ -72,11 +63,7 @@ export default function ToolsButton({ selectedTools, onToolsChange, isStreaming 
       </button>
 
       {isOpen && (
-        <div 
-          className="absolute bottom-full left-0 mb-2 w-56 bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-fadeIn z-50"
-          onClick={(e) => e.stopPropagation()}
-          onMouseDown={(e) => e.stopPropagation()}
-        >
+        <div className="absolute bottom-full left-0 mb-2 w-56 bg-card border border-border rounded-xl shadow-lg overflow-hidden animate-fadeIn z-50">
           <div className="p-2">
             <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">
               Select Tools
@@ -87,11 +74,7 @@ export default function ToolsButton({ selectedTools, onToolsChange, isStreaming 
                 <button
                   key={tool.id}
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    toggleTool(tool.id)
-                  }}
-                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={() => toggleTool(tool.id)}
                   className={cn(
                     "w-full flex items-center gap-3 px-2 py-2 rounded-lg transition-colors hover:bg-muted/50",
                     isSelected && "bg-primary/5"

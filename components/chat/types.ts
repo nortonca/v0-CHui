@@ -1,7 +1,7 @@
 export interface ActiveButtonState {
   add: boolean
   tools: boolean
-  thinkLevel: "off" | "low" | "medium" | "high"
+  thinkLevel: "off" | "on" | "deep"
   image: boolean
   browser: boolean
   selectedTools: string[]
