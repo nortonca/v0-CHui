@@ -37,7 +37,7 @@ export default function MessageSectionComponent({
               ? { height: `${getContentHeight(viewportHeight)}px` }
               : {}
           }
-          className="pt-4 flex flex-col justify-start"
+          className="pt-6 flex flex-col justify-start"
         >
           {section.messages.map((message) => (
             <MessageComponent
@@ -52,7 +52,7 @@ export default function MessageSectionComponent({
       )}
 
       {!section.isNewSection && (
-        <div>
+        <div className="py-2">
           {section.messages.map((message) => (
             <MessageComponent
               key={message.id}
