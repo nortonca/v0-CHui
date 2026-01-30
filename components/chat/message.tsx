@@ -1,7 +1,11 @@
+"use client"
+
+import { useState } from "react"
 import { cn } from "@/lib/utils"
 import type { Message } from "./types"
 import { RefreshCcw, Copy, Share2, ThumbsUp, ThumbsDown } from "lucide-react"
 import type { StreamingWord } from "./types"
+import ImageViewer from "./image-viewer"
 
 interface MessageProps {
   message: Message
@@ -17,6 +21,13 @@ export default function MessageComponent({
   completedMessages,
 }: MessageProps) {
   const isCompleted = completedMessages.has(message.id)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+
+  const handleImageClick = (imageUrl: string) => {
+    setSelectedImage(imageUrl)
+    setViewerOpen(true)
+  }
 
   return (
     <div className={cn("flex flex-col", message.type === "user" ? "items-end" : "items-start")}>
@@ -24,12 +35,24 @@ export default function MessageComponent({
       {message.images && message.images.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2 max-w-[80%]">
           {message.images.map((image) => (
-            <img
+            <div
               key={image.id}
-              src={image.url || "/placeholder.svg"}
-              alt="Uploaded"
-              className="max-w-[150px] max-h-[150px] object-cover rounded-lg border border-gray-200"
-            />
+              className="relative"
+              role="button"
+              tabIndex={0}
+              onClick={() => handleImageClick(image.url)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  handleImageClick(image.url)
+                }
+              }}
+            >
+              <img
+                src={image.url || "/placeholder.svg"}
+                alt="Uploaded"
+                className="max-w-[150px] max-h-[150px] object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+              />
+            </div>
           ))}
         </div>
       )}
@@ -76,6 +99,11 @@ export default function MessageComponent({
             <ThumbsDown className="h-4 w-4" />
           </button>
         </div>
+      )}
+
+      {/* Image Viewer */}
+      {selectedImage && (
+        <ImageViewer imageUrl={selectedImage} isOpen={viewerOpen} onClose={() => setViewerOpen(false)} />
       )}
     </div>
   )
