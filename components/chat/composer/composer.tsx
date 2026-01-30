@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { cn } from "@/lib/utils"
-import { Send, Plus, X, Mic, Sparkles } from "lucide-react"
+import { Send, Plus, Mic, Sparkles, AudioWaveform } from "lucide-react"
 import type { ActiveButtonState, UploadedImage } from "../types"
 import type { Memory } from "../memory-panel"
 import type { Checkpoint } from "../checkpoints-panel"
@@ -72,6 +72,7 @@ export default function Composer({
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [activePanel, setActivePanel] = useState<string | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
+  const [isRecording, setIsRecording] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Count active features for badge
@@ -178,6 +179,26 @@ export default function Composer({
   }
 
   const hasContent = inputValue.trim() !== "" || uploadedImages.length > 0
+
+  // Microphone handler
+  const handleMicrophoneClick = () => {
+    if (isRecording) {
+      setIsRecording(false)
+    } else {
+      setIsRecording(true)
+      // Simulate recording - in production this would use Web Speech API
+      setTimeout(() => {
+        setIsRecording(false)
+        setInputValue(inputValue + (inputValue ? " " : "") + "This is simulated voice input.")
+      }, 3000)
+    }
+  }
+
+  // Voice mode handler
+  const handleVoiceModeClick = () => {
+    // Open voice agent mode - this would trigger a modal or view change
+    console.log("Voice mode activated")
+  }
 
   return (
     <div 
@@ -298,8 +319,8 @@ export default function Composer({
             </div>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              {/* Think indicator */}
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+              {/* Think indicator - desktop only */}
               {activeButtons.thinkLevel !== "off" && (
                 <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
                   <Sparkles className="w-3 h-3" />
@@ -307,7 +328,29 @@ export default function Composer({
                 </div>
               )}
 
-              {/* Voice/Send Button */}
+              {/* Microphone Button - Always visible */}
+              <button
+                type="button"
+                onClick={handleMicrophoneClick}
+                disabled={isStreaming}
+                className={cn(
+                  "flex items-center justify-center",
+                  "w-10 h-10 sm:w-9 sm:h-9 rounded-full",
+                  "border border-border",
+                  "hover:bg-muted/50 active:bg-muted/75",
+                  "transition-all duration-150",
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                  isRecording && "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800"
+                )}
+                aria-label={isRecording ? "Stop recording" : "Start voice input"}
+              >
+                <Mic className={cn(
+                  "w-4 h-4",
+                  isRecording ? "text-red-500" : "text-muted-foreground"
+                )} />
+              </button>
+
+              {/* Voice Mode / Send Button */}
               {hasContent ? (
                 <button
                   type="submit"
@@ -327,15 +370,19 @@ export default function Composer({
               ) : (
                 <button
                   type="button"
+                  onClick={handleVoiceModeClick}
+                  disabled={isStreaming}
                   className={cn(
                     "flex items-center justify-center",
                     "w-10 h-10 sm:w-9 sm:h-9 rounded-full",
-                    "bg-muted/50 hover:bg-muted active:bg-muted/75",
-                    "transition-all duration-150"
+                    "bg-primary text-primary-foreground",
+                    "hover:bg-primary/90 active:scale-95",
+                    "transition-all duration-150",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
-                  aria-label="Voice input"
+                  aria-label="Open voice mode"
                 >
-                  <Mic className="w-5 h-5 text-muted-foreground" />
+                  <AudioWaveform className="w-4 h-4" />
                 </button>
               )}
             </div>
