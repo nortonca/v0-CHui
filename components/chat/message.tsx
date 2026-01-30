@@ -8,6 +8,7 @@ import type { StreamingWord } from "./types"
 import ImageViewer from "./image-viewer"
 import ThinkingDisplay from "./thinking-display"
 import ToolCallDisplay from "./tool-call-display"
+import { Markdown } from "streamdown"
 
 interface MessageProps {
   message: Message
@@ -75,24 +76,28 @@ export default function MessageComponent({
 
       <div
         className={cn(
-          "max-w-[80%] px-4 py-2 rounded-2xl",
+          "max-w-[80%] px-4 py-2 rounded-2xl prose prose-sm dark:prose-invert max-w-none",
           message.type === "user" ? "bg-card border border-border rounded-br-none" : "text-foreground",
         )}
       >
-        {/* For user messages or completed system messages, render without animation */}
-        {message.content && (
-          <span className={message.type === "system" && !isCompleted ? "animate-fade-in" : ""}>{message.content}</span>
-        )}
+        {/* For user messages, render plain text */}
+        {message.type === "user" && message.content && <div className="whitespace-pre-wrap">{message.content}</div>}
 
-        {/* For streaming messages, render with animation */}
-        {message.id === streamingMessageId && (
-          <span className="inline">
-            {streamingWords.map((word) => (
-              <span key={word.id} className="animate-fade-in inline">
-                {word.text}
-              </span>
-            ))}
-          </span>
+        {/* For system messages, use Streamdown for markdown rendering */}
+        {message.type === "system" && (
+          <>
+            {/* For completed messages, render full content */}
+            {message.content && message.id !== streamingMessageId && (
+              <Markdown>{message.content}</Markdown>
+            )}
+
+            {/* For streaming messages, combine content and streaming words */}
+            {message.id === streamingMessageId && (
+              <Markdown>
+                {message.content + streamingWords.map((word) => word.text).join("")}
+              </Markdown>
+            )}
+          </>
         )}
       </div>
 
