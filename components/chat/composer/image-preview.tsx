@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { cn } from "@/lib/utils"
-import { X, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react"
+import { X, ZoomIn, ChevronLeft, ChevronRight, RotateCw } from "lucide-react"
 import Image from "next/image"
 import type { UploadedImage } from "../types"
 
@@ -13,9 +13,21 @@ interface ImagePreviewProps {
 
 export default function ImagePreview({ images, onRemove }: ImagePreviewProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [rotations, setRotations] = useState<Record<string, number>>({})
   
   const isLightboxOpen = lightboxIndex !== null
   const currentImage = isLightboxOpen ? images[lightboxIndex] : null
+
+  // Get rotation for an image (0, 90, 180, or 270)
+  const getRotation = (id: string) => rotations[id] || 0
+
+  // Rotate image by 90 degrees
+  const handleRotate = (id: string) => {
+    setRotations(prev => ({
+      ...prev,
+      [id]: ((prev[id] || 0) + 90) % 360
+    }))
+  }
 
   // Close lightbox on Escape key
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -69,6 +81,7 @@ export default function ImagePreview({ images, onRemove }: ImagePreviewProps) {
                 alt="Uploaded image"
                 fill
                 className="object-cover transition-transform group-hover:scale-105"
+                style={{ transform: `rotate(${getRotation(image.id)}deg)` }}
               />
               {/* Hover overlay with zoom icon */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
@@ -76,6 +89,25 @@ export default function ImagePreview({ images, onRemove }: ImagePreviewProps) {
               </div>
             </button>
             
+            {/* Rotate button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleRotate(image.id)
+              }}
+              className={cn(
+                "absolute -bottom-2 -right-2 w-6 h-6 rounded-full",
+                "bg-card border border-border shadow-md",
+                "text-muted-foreground hover:text-primary hover:border-primary/30",
+                "flex items-center justify-center",
+                "transition-all duration-150"
+              )}
+              aria-label="Rotate image"
+            >
+              <RotateCw className="w-3 h-3" />
+            </button>
+
             {/* Remove button */}
             <button
               type="button"
@@ -133,14 +165,25 @@ export default function ImagePreview({ images, onRemove }: ImagePreviewProps) {
                   </span>
                 )}
               </div>
-              <button
-                type="button"
-                onClick={() => setLightboxIndex(null)}
-                className="p-2 -mr-2 hover:bg-muted rounded-xl transition-colors"
-                aria-label="Close preview"
-              >
-                <X className="size-5 text-muted-foreground" />
-              </button>
+              <div className="flex items-center gap-1">
+                {/* Rotate button in header */}
+                <button
+                  type="button"
+                  onClick={() => handleRotate(currentImage.id)}
+                  className="p-2 hover:bg-muted rounded-xl transition-colors"
+                  aria-label="Rotate image"
+                >
+                  <RotateCw className="size-5 text-muted-foreground" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLightboxIndex(null)}
+                  className="p-2 -mr-2 hover:bg-muted rounded-xl transition-colors"
+                  aria-label="Close preview"
+                >
+                  <X className="size-5 text-muted-foreground" />
+                </button>
+              </div>
             </div>
 
             {/* Image Area */}
@@ -150,7 +193,8 @@ export default function ImagePreview({ images, onRemove }: ImagePreviewProps) {
                 alt="Preview image"
                 width={1200}
                 height={800}
-                className="max-w-full max-h-[60vh] object-contain rounded-lg"
+                className="max-w-full max-h-[60vh] object-contain rounded-lg transition-transform duration-300"
+                style={{ transform: `rotate(${getRotation(currentImage.id)}deg)` }}
               />
 
               {/* Navigation arrows - inside the image area */}
