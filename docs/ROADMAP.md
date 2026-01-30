@@ -86,7 +86,22 @@ Add depth for experienced users without overwhelming beginners.
 
 ### Features
 
-#### 2.1 Keyboard Shortcuts
+#### 2.1 Sub-Agents & Workflow Automation 🔮
+- [ ] Manager Agent with inline to-do display
+- [ ] Kanban board for workflow tracking
+- [ ] Browser Agent for web automation
+- [ ] Coder Agent for code/data tasks
+- [ ] Live reasoning traces (ReAct loop)
+- [ ] Workflow detail modal
+- [ ] Natural language workflow creation
+- [ ] Voice input for mobile workflow requests
+
+**Priority:** High  
+**Effort:** Very High (16-24 weeks)  
+**Impact:** Transforms assistant into autonomous team member  
+**See:** `/docs/FUTURE_SUB_AGENTS.md` for full specification
+
+#### 2.2 Keyboard Shortcuts
 - [ ] Command palette (Cmd+K / Ctrl+K)
 - [ ] Quick Action shortcuts (Cmd+1, Cmd+2, etc.)
 - [ ] Navigation shortcuts (Cmd+M for Memory, etc.)
@@ -96,7 +111,7 @@ Add depth for experienced users without overwhelming beginners.
 **Effort:** Medium  
 **Impact:** Power user productivity
 
-#### 2.2 Custom Quick Actions
+#### 2.3 Custom Quick Actions
 - [ ] User can add custom prompt templates
 - [ ] Drag-to-reorder Quick Actions
 - [ ] Organize into categories
