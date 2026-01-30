@@ -544,8 +544,12 @@ export default function ChatInterface() {
         activityCount={activities.filter(a => a.type === "thinking" || a.type === "searching" || a.type === "writing").length}
       />
 
-      <div ref={chatContainerRef} className="flex-grow pb-48 sm:pb-40 pt-12 overflow-y-auto">
-        <div className="max-w-3xl mx-auto">
+      {/* Messages Area - flex-1 and min-h-0 for proper scroll containment */}
+      <div 
+        ref={chatContainerRef} 
+        className="flex-1 min-h-0 pt-12 overflow-y-auto scroll-smooth"
+      >
+        <div className="max-w-3xl mx-auto pb-4">
           {messageSections.map((section, sectionIndex) => (
             <MessageSectionComponent
               key={section.id}
@@ -560,6 +564,8 @@ export default function ChatInterface() {
           ))}
           <div ref={messagesEndRef} />
         </div>
+        {/* Spacer for fixed composer - ensures content isn't hidden */}
+        <div className="h-44 sm:h-36" aria-hidden="true" />
       </div>
 
       {/* Composer - Minimal Input Bar */}

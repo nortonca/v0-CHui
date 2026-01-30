@@ -112,38 +112,38 @@ export default function MessageComponent({
         )}
       </div>
 
-      {/* Message actions */}
+      {/* Message actions - always visible for completed AI messages */}
       {message.type === "system" && message.completed && (
-        <div className="flex items-center gap-1 mt-1.5 opacity-0 hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-0.5 mt-2">
           <button 
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
             aria-label="Regenerate"
           >
-            <RefreshCcw className="h-3.5 w-3.5" />
+            <RefreshCcw className="h-4 w-4" />
           </button>
           <button 
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
             aria-label="Copy"
           >
-            <Copy className="h-3.5 w-3.5" />
+            <Copy className="h-4 w-4" />
           </button>
           <button 
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
             aria-label="Share"
           >
-            <Share2 className="h-3.5 w-3.5" />
+            <Share2 className="h-4 w-4" />
           </button>
           <button 
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
             aria-label="Like"
           >
-            <ThumbsUp className="h-3.5 w-3.5" />
+            <ThumbsUp className="h-4 w-4" />
           </button>
           <button 
-            className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
             aria-label="Dislike"
           >
-            <ThumbsDown className="h-3.5 w-3.5" />
+            <ThumbsDown className="h-4 w-4" />
           </button>
         </div>
       )}
