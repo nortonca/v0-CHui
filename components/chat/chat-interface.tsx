@@ -6,7 +6,6 @@ import type { Message, MessageSection, StreamingWord, UploadedImage, ActiveButto
 import { getAIResponse } from "./utils"
 import ChatHeader from "./chat-header"
 import MessageSectionComponent from "./message-section"
-import InputArea from "./input-area"
 import OnboardingModal, { type OnboardingData } from "@/components/onboarding/onboarding-modal"
 import ActivityModalContent, { type ActivityItem, type ScheduledTask } from "./activity-modal-content"
 import type { Memory } from "./memory-panel"
@@ -563,32 +562,19 @@ export default function ChatInterface() {
         </div>
       </div>
 
-      <InputArea
-        inputValue={inputValue}
-        setInputValue={setInputValue}
-        handleSubmit={handleSubmit}
-        isStreaming={isStreaming}
-        isMobile={isMobile}
-        activeButtons={activeButtons}
-        setActiveButtons={setActiveButtons}
-        textareaRef={textareaRef}
-        uploadedImages={uploadedImages}
-        setUploadedImages={setUploadedImages}
-        // New props for features
-        memories={memories}
-        onMemoryEdit={handleMemoryEdit}
-        onMemoryDelete={handleMemoryDelete}
-        checkpoints={checkpoints}
-        currentCheckpointId={currentCheckpointId}
-        onCheckpointRestore={restoreCheckpoint}
-        onCheckpointCreate={() => createCheckpoint("Manual save", "User-created checkpoint")}
-        playbooks={playbooks}
-        onPlaybookRun={handlePlaybookRun}
-        onPlaybookAdd={handlePlaybookAdd}
-        onPlaybookDelete={handlePlaybookDelete}
-        collaborationMode={collaborationMode}
-        onCollaborationModeChange={setCollaborationMode}
-      />
+      {/* Input Area Simplified */}
+      <div>
+        <textarea
+          ref={textareaRef}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          className="border p-2"
+          placeholder="Type your message here..."
+        />
+        <button onClick={handleSubmit} disabled={isStreaming}>
+          Send
+        </button>
+      </div>
     </div>
   )
 }
