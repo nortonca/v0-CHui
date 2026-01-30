@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { X, Zap, Search, Plus, Check } from "lucide-react"
+import { X, Zap, Search, Plus, Check, Globe, Terminal, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Tool {
@@ -12,6 +12,13 @@ interface Tool {
   isConnected: boolean
   isAvailable: boolean
   isCustom?: boolean
+  type?: "local" | "http" | "sse"
+  config?: {
+    command?: string
+    args?: string
+    url?: string
+    envVars?: string
+  }
 }
 
 interface ToolsModalContentProps {
@@ -65,6 +72,18 @@ export default function ToolsModalContent({ onClose }: ToolsModalContentProps) {
   const [tools, setTools] = useState<Tool[]>(MOCK_TOOLS)
   const [searchQuery, setSearchQuery] = useState("")
   const [showAddForm, setShowAddForm] = useState(false)
+  
+  // MCP Form State
+  const [serverType, setServerType] = useState<"local" | "http" | "sse">("local")
+  const [serverName, setServerName] = useState("")
+  const [serverDescription, setServerDescription] = useState("")
+  // Local server fields
+  const [command, setCommand] = useState("")
+  const [args, setArgs] = useState("")
+  const [envVars, setEnvVars] = useState("")
+  // Remote server fields
+  const [serverUrl, setServerUrl] = useState("")
+
   const [newToolName, setNewToolName] = useState("")
   const [newToolDescription, setNewToolDescription] = useState("")
 
@@ -87,23 +106,45 @@ export default function ToolsModalContent({ onClose }: ToolsModalContentProps) {
     )
   }
 
+  const resetForm = () => {
+    setServerType("local")
+    setServerName("")
+    setServerDescription("")
+    setCommand("")
+    setArgs("")
+    setEnvVars("")
+    setServerUrl("")
+    setShowAddForm(false)
+    setNewToolName("")
+    setNewToolDescription("")
+  }
+
+  const isFormValid = () => {
+    if (!serverName.trim()) return false
+    if (serverType === "local" && !command.trim()) return false
+    if ((serverType === "http" || serverType === "sse") && !serverUrl.trim()) return false
+    return true
+  }
+
   const handleAddTool = () => {
-    if (!newToolName.trim()) return
+    if (!isFormValid()) return
 
     const newTool: Tool = {
       id: `custom-${Date.now()}`,
-      name: newToolName,
-      description: newToolDescription || "Custom MCP tool",
-      category: "utilities",
+      name: serverName,
+      description: serverDescription || `Custom ${serverType.toUpperCase()} MCP server`,
+      category: "integrations",
       isConnected: false,
       isAvailable: true,
       isCustom: true,
+      type: serverType,
+      config: serverType === "local" 
+        ? { command, args, envVars }
+        : { url: serverUrl }
     }
 
     setTools((prev) => [...prev, newTool])
-    setNewToolName("")
-    setNewToolDescription("")
-    setShowAddForm(false)
+    resetForm()
   }
 
   return (
@@ -187,58 +228,202 @@ export default function ToolsModalContent({ onClose }: ToolsModalContentProps) {
               )}
             >
               <Plus className="size-4" />
-              <span className="text-sm font-medium">Add Custom Tool</span>
+              <span className="text-sm font-medium">Add MCP Server</span>
             </button>
           )}
 
-          {/* Add Tool Form */}
+          {/* Add MCP Server Form */}
           {showAddForm && (
-            <div className="mb-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  placeholder="Tool name"
-                  value={newToolName}
-                  onChange={(e) => setNewToolName(e.target.value)}
-                  className={cn(
-                    "w-full px-3 py-2 rounded-lg border border-border bg-background",
-                    "text-sm text-foreground placeholder:text-muted-foreground",
-                    "focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  )}
-                />
-                <input
-                  type="text"
-                  placeholder="Description (optional)"
-                  value={newToolDescription}
-                  onChange={(e) => setNewToolDescription(e.target.value)}
-                  className={cn(
-                    "w-full px-3 py-2 rounded-lg border border-border bg-background",
-                    "text-sm text-foreground placeholder:text-muted-foreground",
-                    "focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  )}
-                />
-                <div className="flex items-center gap-2">
+            <div className="mb-4 p-4 rounded-xl border border-primary/20 bg-card">
+              <div className="space-y-4">
+                {/* Server Type Selection */}
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-2 block">
+                    Server Type
+                  </label>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setServerType("local")}
+                      className={cn(
+                        "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                        serverType === "local"
+                          ? "bg-primary text-white"
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      )}
+                    >
+                      <Terminal className="size-4" />
+                      Local
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setServerType("http")}
+                      className={cn(
+                        "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                        serverType === "http"
+                          ? "bg-primary text-white"
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      )}
+                    >
+                      <Globe className="size-4" />
+                      HTTP
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setServerType("sse")}
+                      className={cn(
+                        "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                        serverType === "sse"
+                          ? "bg-primary text-white"
+                          : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                      )}
+                    >
+                      <Globe className="size-4" />
+                      SSE
+                    </button>
+                  </div>
+                </div>
+
+                {/* Server Name */}
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-2 block">
+                    Server Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., sentry, notion, github"
+                    value={serverName}
+                    onChange={(e) => setServerName(e.target.value)}
+                    className={cn(
+                      "w-full px-3 py-2 rounded-lg border border-border bg-background",
+                      "text-sm text-foreground placeholder:text-muted-foreground",
+                      "focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    )}
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-2 block">
+                    Description <span className="text-muted-foreground/60">(optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="What does this server do?"
+                    value={serverDescription}
+                    onChange={(e) => setServerDescription(e.target.value)}
+                    className={cn(
+                      "w-full px-3 py-2 rounded-lg border border-border bg-background",
+                      "text-sm text-foreground placeholder:text-muted-foreground",
+                      "focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    )}
+                  />
+                </div>
+
+                {/* Local Server Fields */}
+                {serverType === "local" && (
+                  <>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-2 block">
+                        Command
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g., npx, docker, node"
+                        value={command}
+                        onChange={(e) => setCommand(e.target.value)}
+                        className={cn(
+                          "w-full px-3 py-2 rounded-lg border border-border bg-background font-mono",
+                          "text-sm text-foreground placeholder:text-muted-foreground",
+                          "focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        )}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-2 block">
+                        Arguments <span className="text-muted-foreground/60">(space-separated)</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g., @sentry/mcp-server@latest --host=https://sentry.io"
+                        value={args}
+                        onChange={(e) => setArgs(e.target.value)}
+                        className={cn(
+                          "w-full px-3 py-2 rounded-lg border border-border bg-background font-mono",
+                          "text-sm text-foreground placeholder:text-muted-foreground",
+                          "focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        )}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-2 block">
+                        Environment Variables <span className="text-muted-foreground/60">(KEY=value, one per line)</span>
+                      </label>
+                      <textarea
+                        placeholder={"SENTRY_ACCESS_TOKEN=your_token\nSENTRY_HOST=https://sentry.io"}
+                        value={envVars}
+                        onChange={(e) => setEnvVars(e.target.value)}
+                        rows={3}
+                        className={cn(
+                          "w-full px-3 py-2 rounded-lg border border-border bg-background font-mono",
+                          "text-sm text-foreground placeholder:text-muted-foreground",
+                          "focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+                        )}
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* Remote Server Fields (HTTP/SSE) */}
+                {(serverType === "http" || serverType === "sse") && (
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-2 block">
+                      Server URL
+                    </label>
+                    <input
+                      type="url"
+                      placeholder={serverType === "sse" 
+                        ? "e.g., https://docs.mcp.cloudflare.com/sse"
+                        : "e.g., https://api.example.com/mcp"
+                      }
+                      value={serverUrl}
+                      onChange={(e) => setServerUrl(e.target.value)}
+                      className={cn(
+                        "w-full px-3 py-2 rounded-lg border border-border bg-background font-mono",
+                        "text-sm text-foreground placeholder:text-muted-foreground",
+                        "focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      )}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1.5">
+                      {serverType === "sse" 
+                        ? "URL endpoint for Server-Sent Events connection"
+                        : "HTTP endpoint for the MCP server"
+                      }
+                    </p>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 pt-2">
                   <button
                     onClick={handleAddTool}
-                    disabled={!newToolName.trim()}
+                    disabled={!isFormValid()}
                     className={cn(
-                      "flex-1 px-3 py-2 rounded-lg bg-primary text-white",
+                      "flex-1 px-3 py-2.5 rounded-lg bg-primary text-white",
                       "hover:bg-primary/90 transition-colors text-sm font-medium",
                       "disabled:opacity-50 disabled:cursor-not-allowed",
                       "flex items-center justify-center gap-1.5"
                     )}
                   >
                     <Check className="size-4" />
-                    Add Tool
+                    Add Server
                   </button>
                   <button
-                    onClick={() => {
-                      setShowAddForm(false)
-                      setNewToolName("")
-                      setNewToolDescription("")
-                    }}
+                    onClick={resetForm}
                     className={cn(
-                      "px-3 py-2 rounded-lg border border-border bg-background",
+                      "px-4 py-2.5 rounded-lg border border-border bg-background",
                       "hover:bg-muted/50 transition-colors text-sm font-medium text-foreground"
                     )}
                   >
