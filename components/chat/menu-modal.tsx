@@ -1,9 +1,10 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 
-import { X, Settings, History, Sparkles, HelpCircle, User } from "lucide-react"
+import { X, Settings, History, Sparkles, HelpCircle, User, Plug } from "lucide-react"
 import { cn } from "@/lib/utils"
+import ToolsModal from "@/components/tools/tools-modal"
 
 interface MenuModalProps {
   isOpen: boolean
@@ -11,10 +12,15 @@ interface MenuModalProps {
 }
 
 export default function MenuModal({ isOpen, onClose }: MenuModalProps) {
+  const [isToolsOpen, setIsToolsOpen] = useState(false)
+
   if (!isOpen) return null
 
   return (
     <>
+      {/* Tools Modal */}
+      <ToolsModal isOpen={isToolsOpen} onClose={() => setIsToolsOpen(false)} />
+
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 animate-fadeIn"
@@ -70,6 +76,15 @@ export default function MenuModal({ isOpen, onClose }: MenuModalProps) {
               }}
             />
             <MenuButton
+              icon={<Plug className="size-5" />}
+              label="MCP Tools"
+              description="Manage tool connections"
+              onClick={() => {
+                setIsToolsOpen(true)
+              }}
+              badge="2 active"
+            />
+            <MenuButton
               icon={<User className="size-5" />}
               label="Profile"
               description="Manage your account"
@@ -108,9 +123,10 @@ interface MenuButtonProps {
   label: string
   description: string
   onClick: () => void
+  badge?: string
 }
 
-function MenuButton({ icon, label, description, onClick }: MenuButtonProps) {
+function MenuButton({ icon, label, description, onClick, badge }: MenuButtonProps) {
   return (
     <button
       onClick={onClick}
@@ -123,8 +139,15 @@ function MenuButton({ icon, label, description, onClick }: MenuButtonProps) {
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-foreground">
-          {label}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-foreground">
+            {label}
+          </span>
+          {badge && (
+            <span className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium">
+              {badge}
+            </span>
+          )}
         </div>
         <div className="text-xs text-muted-foreground mt-0.5">{description}</div>
       </div>
