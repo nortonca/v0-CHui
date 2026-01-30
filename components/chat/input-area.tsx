@@ -16,7 +16,9 @@ import VoiceToggleButton from "./buttons/voice-toggle-button"
 import SendButton from "./buttons/send-button"
 import VoiceModeModal from "@/components/voice/voice-mode-modal"
 import TaskPanel, { type Task } from "./task-panel"
-import { ListTodo } from "lucide-react"
+import MemoryPanel, { type Memory } from "./memory-panel"
+import QuickActions from "./quick-actions"
+import { ListTodo, Brain } from "lucide-react"
 
 interface InputAreaProps {
   inputValue: string
@@ -46,7 +48,9 @@ export default function InputArea({
   const [hasTyped, setHasTyped] = useState(false)
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false)
   const [isTaskPanelExpanded, setIsTaskPanelExpanded] = useState(false)
+  const [isMemoryPanelExpanded, setIsMemoryPanelExpanded] = useState(false)
   const [tasks, setTasks] = useState<Task[]>([])
+  const [memories, setMemories] = useState<Memory[]>([])
   const inputContainerRef = useRef<HTMLDivElement>(null)
   const selectionStateRef = useRef<{ start: number | null; end: number | null }>({ start: null, end: null })
 
@@ -210,9 +214,41 @@ export default function InputArea({
     setTasks((prev) => prev.filter((task) => task.id !== id))
   }
 
+  // Memory management functions
+  const handleMemoryEdit = (id: string, text: string) => {
+    setMemories((prev) =>
+      prev.map((memory) =>
+        memory.id === id ? { ...memory, text } : memory
+      )
+    )
+  }
+
+  const handleMemoryDelete = (id: string) => {
+    setMemories((prev) => prev.filter((memory) => memory.id !== id))
+  }
+
+  // Quick action handler
+  const handleQuickAction = (prompt: string) => {
+    setInputValue(prompt)
+    if (textareaRef.current) {
+      textareaRef.current.focus()
+      // Auto-resize textarea
+      textareaRef.current.style.height = "auto"
+      const newHeight = Math.max(24, Math.min(textareaRef.current.scrollHeight, 160))
+      textareaRef.current.style.height = `${newHeight}px`
+    }
+  }
+
   return (
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-background">
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
+        {/* Quick Actions Bar */}
+        <QuickActions
+          onActionSelect={handleQuickAction}
+          isStreaming={isStreaming}
+          className="mb-3"
+        />
+
         {/* Image upload area */}
         <ImageUpload
           images={uploadedImages}
@@ -229,6 +265,16 @@ export default function InputArea({
           )}
           onClick={handleInputContainerClick}
         >
+          {/* Memory Panel */}
+          <MemoryPanel
+            isExpanded={isMemoryPanelExpanded}
+            onToggle={() => setIsMemoryPanelExpanded(!isMemoryPanelExpanded)}
+            memories={memories}
+            onMemoryEdit={handleMemoryEdit}
+            onMemoryDelete={handleMemoryDelete}
+            isMobile={isMobile}
+          />
+
           {/* Task Panel */}
           <TaskPanel
             isExpanded={isTaskPanelExpanded}
@@ -280,6 +326,26 @@ export default function InputArea({
                   }}
                   isStreaming={isStreaming}
                 />
+
+                {/* Memory Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsMemoryPanelExpanded(!isMemoryPanelExpanded)}
+                  className={cn(
+                    "rounded-full h-8 px-3 flex items-center border border-border gap-1.5 transition-colors bg-background",
+                    isMemoryPanelExpanded && "bg-primary/10 border-primary/20",
+                    memories.length > 0 && !isMemoryPanelExpanded && "border-primary/50"
+                  )}
+                  disabled={isStreaming}
+                  aria-label="Toggle memory"
+                >
+                  <Brain className={cn("h-4 w-4 text-muted-foreground", isMemoryPanelExpanded && "text-primary")} />
+                  {memories.length > 0 && (
+                    <span className={cn("text-xs font-medium", isMemoryPanelExpanded ? "text-primary" : "text-muted-foreground")}>
+                      {memories.length}
+                    </span>
+                  )}
+                </button>
 
                 {/* Task Toggle Button */}
                 <button
