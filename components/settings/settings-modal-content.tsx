@@ -1,6 +1,6 @@
 "use client"
 
-import { X, Brain, ListChecks, Sparkles, Trash2, ShieldQuestion, Zap, MessageSquare } from "lucide-react"
+import { X, Brain, ListChecks, Sparkles, Trash2, ShieldQuestion, MessageCircleQuestion } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 
@@ -44,51 +44,30 @@ const PLANNING_MODES = [
   },
 ]
 
-const WORKING_STYLES = [
+const FOLLOWUP_MODES = [
   { 
-    id: "style1", 
-    label: "Style 1", 
-    description: "Description for Style 1" 
+    id: "when-needed", 
+    label: "When Needed", 
+    description: "Ask questions only when request is ambiguous" 
   },
   { 
-    id: "style2", 
-    label: "Style 2", 
-    description: "Description for Style 2" 
+    id: "always", 
+    label: "Always", 
+    description: "Always ask clarifying questions first" 
   },
   { 
-    id: "style3", 
-    label: "Style 3", 
-    description: "Description for Style 3" 
-  },
-]
-
-const DECISION_STYLES = [
-  { 
-    id: "styleA", 
-    label: "Style A", 
-    description: "Description for Style A" 
-  },
-  { 
-    id: "styleB", 
-    label: "Style B", 
-    description: "Description for Style B" 
-  },
-  { 
-    id: "styleC", 
-    label: "Style C", 
-    description: "Description for Style C" 
+    id: "never", 
+    label: "Never", 
+    description: "Never ask questions, make best assumptions" 
   },
 ]
 
 export default function SettingsModalContent({ onClose }: SettingsModalContentProps) {
   const [agentMode, setAgentMode] = useState("normal")
   const [planningMode, setPlanningMode] = useState("auto")
+  const [followupMode, setFollowupMode] = useState("when-needed")
   const [autoApply, setAutoApply] = useState(true)
   const [memoryEnabled, setMemoryEnabled] = useState(true)
-  const [workingStyle, setWorkingStyle] = useState("style1")
-  const [detailLevel, setDetailLevel] = useState(50)
-  const [decisionStyle, setDecisionStyle] = useState("styleA")
-  const [challengeDecisions, setChallengeDecisions] = useState(false)
 
   return (
     <div className="flex items-center justify-center h-full p-4">
@@ -188,6 +167,48 @@ export default function SettingsModalContent({ onClose }: SettingsModalContentPr
                         : "border-muted-foreground"
                     )}>
                       {planningMode === mode.id && (
+                        <div className="w-full h-full rounded-full bg-white scale-50" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-foreground">{mode.label}</div>
+                    <div className="text-xs text-muted-foreground">{mode.description}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Follow-up Questions Section */}
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <MessageCircleQuestion className="size-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Follow-up Questions</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              When the agent should ask clarifying questions.
+            </p>
+
+            <div className="space-y-2">
+              {FOLLOWUP_MODES.map((mode) => (
+                <button
+                  key={mode.id}
+                  onClick={() => setFollowupMode(mode.id)}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left",
+                    "hover:bg-muted/50",
+                    followupMode === mode.id && "bg-primary/5 border border-primary/20"
+                  )}
+                >
+                  <div className="flex-shrink-0">
+                    <div className={cn(
+                      "w-4 h-4 rounded-full border-2 transition-colors",
+                      followupMode === mode.id
+                        ? "border-primary bg-primary"
+                        : "border-muted-foreground"
+                    )}>
+                      {followupMode === mode.id && (
                         <div className="w-full h-full rounded-full bg-white scale-50" />
                       )}
                     </div>
