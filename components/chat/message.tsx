@@ -2,13 +2,13 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import type { Message } from "./types"
+import type { Message, StreamingWord } from "./types" // Import StreamingWord type
 import { RefreshCcw, Copy, Share2, ThumbsUp, ThumbsDown } from "lucide-react"
-import type { StreamingWord } from "./types"
 import ImageViewer from "./image-viewer"
 import ThinkingDisplay from "./thinking-display"
 import ToolCallDisplay from "./tool-call-display"
-import { Markdown } from "streamdown"
+import { Streamdown } from "streamdown"
+import Markdown from "react-markdown" // Import Markdown component
 
 interface MessageProps {
   message: Message
@@ -88,14 +88,14 @@ export default function MessageComponent({
           <>
             {/* For completed messages, render full content */}
             {message.content && message.id !== streamingMessageId && (
-              <Markdown>{message.content}</Markdown>
+              <Streamdown>{message.content}</Streamdown>
             )}
 
             {/* For streaming messages, combine content and streaming words */}
             {message.id === streamingMessageId && (
-              <Markdown>
+              <Streamdown>
                 {message.content + streamingWords.map((word) => word.text).join("")}
-              </Markdown>
+              </Streamdown>
             )}
           </>
         )}
