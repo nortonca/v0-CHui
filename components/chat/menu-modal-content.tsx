@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils"
 import { useModal } from "@/components/providers/modal-provider"
 import ToolsModalContent from "@/components/tools/tools-modal-content"
 import SettingsModalContent from "@/components/settings/settings-modal-content"
+import ProfileModalContent from "@/components/profile/profile-modal-content"
 
 interface MenuModalContentProps {
   onClose: () => void
@@ -20,6 +21,10 @@ export default function MenuModalContent({ onClose }: MenuModalContentProps) {
 
   const handleOpenSettings = () => {
     openModal("settings", <SettingsModalContent onClose={() => closeModal("settings")} />, () => {})
+  }
+
+  const handleOpenProfile = () => {
+    openModal("profile", <ProfileModalContent onClose={() => closeModal("profile")} />, () => {})
   }
 
   return (
@@ -80,11 +85,8 @@ export default function MenuModalContent({ onClose }: MenuModalContentProps) {
             <MenuButton
               icon={<User className="size-5" />}
               label="Profile"
-              description="Manage your account"
-              onClick={() => {
-                console.log("[v0] Profile clicked")
-                onClose()
-              }}
+              description="About you and your preferences"
+              onClick={handleOpenProfile}
             />
             <MenuButton
               icon={<Settings className="size-5" />}

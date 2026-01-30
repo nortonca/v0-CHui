@@ -1,6 +1,6 @@
 "use client"
 
-import { X, Brain, Sparkles, Trash2 } from "lucide-react"
+import { X, Brain, Zap, MessageSquare, Trash2, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 
@@ -8,18 +8,33 @@ interface SettingsModalContentProps {
   onClose: () => void
 }
 
+const WORKING_STYLES = [
+  { id: "direct", label: "Direct", description: "Straight to the point" },
+  { id: "analytical", label: "Analytical", description: "Detailed breakdowns" },
+  { id: "creative", label: "Creative", description: "Exploratory and imaginative" },
+  { id: "fast", label: "Fast", description: "Quick responses, less detail" },
+]
+
+const DECISION_STYLES = [
+  { id: "ask", label: "Ask First", description: "Confirm before taking actions" },
+  { id: "balanced", label: "Balanced", description: "Ask for major decisions only" },
+  { id: "autonomous", label: "Autonomous", description: "Make reasonable assumptions" },
+]
+
 const PERSONALITY_PRESETS = [
-  { id: "balanced", name: "Balanced", description: "Professional and helpful" },
-  { id: "creative", name: "Creative", description: "Imaginative and expressive" },
-  { id: "technical", name: "Technical", description: "Precise and detailed" },
-  { id: "casual", name: "Casual", description: "Friendly and conversational" },
-  { id: "concise", name: "Concise", description: "Brief and to the point" },
+  { id: "preset1", name: "Preset 1", description: "Description for Preset 1" },
+  { id: "preset2", name: "Preset 2", description: "Description for Preset 2" },
+  { id: "preset3", name: "Preset 3", description: "Description for Preset 3" },
 ]
 
 export default function SettingsModalContent({ onClose }: SettingsModalContentProps) {
-  const [selectedPersonality, setSelectedPersonality] = useState("balanced")
-  const [customInstructions, setCustomInstructions] = useState("")
+  const [workingStyle, setWorkingStyle] = useState("analytical")
+  const [detailLevel, setDetailLevel] = useState(50)
+  const [decisionStyle, setDecisionStyle] = useState("balanced")
+  const [challengeDecisions, setChallengeDecisions] = useState(false)
   const [memoryEnabled, setMemoryEnabled] = useState(true)
+  const [selectedPersonality, setSelectedPersonality] = useState("preset1")
+  const [customInstructions, setCustomInstructions] = useState("")
 
   return (
     <div className="flex items-center justify-center h-full p-4">
@@ -48,65 +63,136 @@ export default function SettingsModalContent({ onClose }: SettingsModalContentPr
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
-          {/* Assistant Personality Section */}
+          {/* Working Style Section */}
           <section>
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="size-5 text-primary" />
-              <h3 className="text-base font-semibold text-foreground">Assistant Personality</h3>
+              <Zap className="size-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Working Style</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Choose how the assistant communicates and responds to your messages.
+              How the assistant thinks and approaches tasks.
             </p>
 
-            <div className="space-y-2 mb-4">
-              {PERSONALITY_PRESETS.map((preset) => (
+            <div className="space-y-2">
+              {WORKING_STYLES.map((style) => (
                 <button
-                  key={preset.id}
-                  onClick={() => setSelectedPersonality(preset.id)}
+                  key={style.id}
+                  onClick={() => setWorkingStyle(style.id)}
                   className={cn(
-                    "w-full flex items-start gap-3 px-4 py-3 rounded-xl transition-colors text-left",
+                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left",
                     "hover:bg-muted/50",
-                    selectedPersonality === preset.id && "bg-primary/5 border border-primary/20"
+                    workingStyle === style.id && "bg-primary/5 border border-primary/20"
                   )}
                 >
-                  <div className="flex-shrink-0 mt-0.5">
+                  <div className="flex-shrink-0">
                     <div className={cn(
                       "w-4 h-4 rounded-full border-2 transition-colors",
-                      selectedPersonality === preset.id
+                      workingStyle === style.id
                         ? "border-primary bg-primary"
                         : "border-muted-foreground"
                     )}>
-                      {selectedPersonality === preset.id && (
+                      {workingStyle === style.id && (
                         <div className="w-full h-full rounded-full bg-white scale-50" />
                       )}
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-foreground">{preset.name}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">{preset.description}</div>
+                    <div className="text-sm font-medium text-foreground">{style.label}</div>
+                    <div className="text-xs text-muted-foreground">{style.description}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          {/* Output Detail Level */}
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <MessageSquare className="size-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Response Detail</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Control how thorough or brief responses should be.
+            </p>
+
+            <div className="px-4 py-4 rounded-xl bg-muted/30">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-muted-foreground">Brief</span>
+                <span className="text-xs text-muted-foreground">Thorough</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={detailLevel}
+                onChange={(e) => setDetailLevel(Number(e.target.value))}
+                className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-primary"
+              />
+            </div>
+          </section>
+
+          {/* Decision Style */}
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <Brain className="size-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Decision Style</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              How the assistant handles choices and actions.
+            </p>
+
+            <div className="space-y-2 mb-4">
+              {DECISION_STYLES.map((style) => (
+                <button
+                  key={style.id}
+                  onClick={() => setDecisionStyle(style.id)}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left",
+                    "hover:bg-muted/50",
+                    decisionStyle === style.id && "bg-primary/5 border border-primary/20"
+                  )}
+                >
+                  <div className="flex-shrink-0">
+                    <div className={cn(
+                      "w-4 h-4 rounded-full border-2 transition-colors",
+                      decisionStyle === style.id
+                        ? "border-primary bg-primary"
+                        : "border-muted-foreground"
+                    )}>
+                      {decisionStyle === style.id && (
+                        <div className="w-full h-full rounded-full bg-white scale-50" />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-foreground">{style.label}</div>
+                    <div className="text-xs text-muted-foreground">{style.description}</div>
                   </div>
                 </button>
               ))}
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">
-                Custom Instructions
-              </label>
-              <textarea
-                value={customInstructions}
-                onChange={(e) => setCustomInstructions(e.target.value)}
-                placeholder="Add specific instructions for how the assistant should behave..."
+            {/* Challenge decisions toggle */}
+            <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-muted/30">
+              <div className="flex-1">
+                <div className="text-sm font-medium text-foreground">Challenge Decisions</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  Suggest alternatives when appropriate
+                </div>
+              </div>
+              <button
+                onClick={() => setChallengeDecisions(!challengeDecisions)}
                 className={cn(
-                  "w-full px-3 py-2 rounded-xl border border-border bg-background",
-                  "text-sm text-foreground placeholder:text-muted-foreground",
-                  "focus:outline-none focus:ring-2 focus:ring-primary/20",
-                  "resize-none h-24"
+                  "relative w-11 h-6 rounded-full transition-colors",
+                  challengeDecisions ? "bg-primary" : "bg-muted"
                 )}
-              />
-              <p className="text-xs text-muted-foreground mt-2">
-                These instructions will be applied to all conversations.
-              </p>
+                aria-label="Toggle challenge decisions"
+              >
+                <div className={cn(
+                  "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform",
+                  challengeDecisions && "translate-x-5"
+                )} />
+              </button>
             </div>
           </section>
 
