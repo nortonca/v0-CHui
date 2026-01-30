@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import MicrophoneButton from "./buttons/microphone-button" // Import MicrophoneButton
 
 import { useState, useRef } from "react"
 import { cn } from "@/lib/utils"
@@ -10,7 +11,7 @@ import TextareaInput from "./textarea-input"
 import ImageButton from "./buttons/image-button"
 import SearchButton from "./buttons/search-button"
 import ThinkButton from "./buttons/think-button"
-import MicrophoneButton from "./buttons/microphone-button"
+import VoiceToggleButton from "./buttons/voice-toggle-button"
 import SendButton from "./buttons/send-button"
 
 interface InputAreaProps {
@@ -225,14 +226,22 @@ export default function InputArea({
               </div>
 
               <div className="flex items-center space-x-2">
-                <MicrophoneButton isStreaming={isStreaming} setInputValue={setInputValue} setHasTyped={setHasTyped} />
-
-                <SendButton
-                  hasTyped={hasTyped}
-                  inputValue={inputValue}
-                  isStreaming={isStreaming}
-                  uploadedImages={uploadedImages}
-                />
+                {!hasTyped && uploadedImages.length === 0 ? (
+                  <VoiceToggleButton
+                    isStreaming={isStreaming}
+                    onClick={() => {
+                      // Voice mode toggle logic
+                      console.log("[v0] Voice mode activated")
+                    }}
+                  />
+                ) : (
+                  <SendButton
+                    hasTyped={hasTyped}
+                    inputValue={inputValue}
+                    isStreaming={isStreaming}
+                    uploadedImages={uploadedImages}
+                  />
+                )}
               </div>
             </div>
           </div>
