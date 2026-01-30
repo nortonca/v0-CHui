@@ -74,17 +74,17 @@ Use Tailwind's spacing scale (multiples of 0.25rem):
 
 **Primary Button:**
 ```tsx
-className="bg-primary text-white hover:bg-primary-hover rounded-full px-4 py-2"
+className="bg-primary text-white hover:bg-primary/90 rounded-full px-4 py-2 transition-colors"
 ```
 
 **Secondary Button:**
 ```tsx
-className="bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-full px-4 py-2"
+className="bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-full px-4 py-2 transition-colors"
 ```
 
 **Ghost Button:**
 ```tsx
-className="hover:bg-muted text-foreground rounded-full px-4 py-2"
+className="hover:bg-muted/50 text-foreground rounded-full px-4 py-2 transition-colors"
 ```
 
 ### Cards
@@ -109,6 +109,17 @@ className="bg-card border border-input rounded-xl px-4 py-2 focus:ring-2 focus:r
 ### Transitions
 Default transition duration: 200ms
 Common easing: `ease-out` or `cubic-bezier(0.4, 0, 0.6, 1)`
+
+## Hover States
+
+All interactive elements should have subtle hover states that darken the background:
+- **Primary buttons:** `hover:bg-primary/90` (darkens the orange by 10%)
+- **Secondary buttons:** `hover:bg-secondary/80` (darkens by 20%)
+- **Ghost buttons:** `hover:bg-muted/50` (adds subtle gray overlay)
+- **Card/Menu items:** `hover:bg-muted/50` (consistent subtle darkening)
+- **Links:** `hover:underline` (text decoration only)
+
+**Design Principle:** Hover states should provide feedback through subtle darkening, not color changes. This creates a cohesive, professional experience where elements don't shift colors unpredictably.
 
 ## Utility Classes
 
@@ -157,14 +168,14 @@ The design system automatically adapts to dark mode with adjusted:
 
 ### Voice Mode Button
 ```tsx
-<button className="bg-primary text-white rounded-full h-10 w-10 hover:bg-primary-hover transition-all shadow-sm hover:shadow-md">
+<button className="bg-primary text-white rounded-full h-10 w-10 hover:bg-primary/90 transition-all shadow-sm hover:shadow-md">
   <AudioWaveform className="h-5 w-5" />
 </button>
 ```
 
 ### Microphone Button (Active State)
 ```tsx
-<button className="bg-primary text-white rounded-full w-16 h-16 hover:bg-primary-hover shadow-lg scale-105">
+<button className="bg-primary text-white rounded-full w-16 h-16 hover:bg-primary/90 shadow-lg scale-105">
   <Mic className="size-6" />
   <span className="absolute inset-0 rounded-full bg-primary animate-ping-primary opacity-75" />
 </button>
@@ -195,5 +206,6 @@ When updating components to use the standardized orange system:
 1. Replace any `bg-orange-*` with `bg-primary`
 2. Replace hardcoded orange colors with semantic tokens
 3. Use `text-white` or `text-primary-foreground` on primary backgrounds
-4. Apply `hover:bg-primary-hover` for interactive states
-5. Use provided utility classes for glows and special effects
+4. Apply `hover:bg-primary/90` for interactive states (subtle darkening)
+5. **Never use `hover:bg-accent` or color-changing hovers** - always darken instead
+6. Use provided utility classes for glows and special effects

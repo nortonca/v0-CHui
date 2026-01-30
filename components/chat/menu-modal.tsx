@@ -116,14 +116,14 @@ function MenuButton({ icon, label, description, onClick }: MenuButtonProps) {
       onClick={onClick}
       className={cn(
         "w-full flex items-start gap-4 px-4 py-3.5 rounded-xl",
-        "hover:bg-accent transition-colors text-left group"
+        "hover:bg-muted/50 transition-colors text-left group"
       )}
     >
-      <div className="flex-shrink-0 mt-0.5 text-muted-foreground group-hover:text-accent-foreground transition-colors">
+      <div className="flex-shrink-0 mt-0.5 text-muted-foreground transition-colors">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-foreground group-hover:text-accent-foreground">
+        <div className="text-sm font-medium text-foreground">
           {label}
         </div>
         <div className="text-xs text-muted-foreground mt-0.5">{description}</div>
