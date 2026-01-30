@@ -128,7 +128,7 @@
   --animate-pop: pop 0.3s ease-out;
   --animate-scale-in: scale-in 0.3s ease-out forwards;
 }
- 
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
