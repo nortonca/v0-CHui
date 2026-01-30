@@ -6,6 +6,7 @@ import type { Message, MessageSection, StreamingWord, UploadedImage, ActiveButto
 import { getAIResponse } from "./utils"
 import ChatHeader from "./chat-header"
 import MessageSectionComponent from "./message-section"
+import InputAreaSimplified from "./input/input-area-simplified"
 import OnboardingModal, { type OnboardingData } from "@/components/onboarding/onboarding-modal"
 import ActivityModalContent, { type ActivityItem, type ScheduledTask } from "./activity-modal-content"
 import type { Memory } from "./memory-panel"
@@ -13,7 +14,6 @@ import type { Checkpoint } from "./checkpoints-panel"
 import type { Playbook } from "./playbooks-panel"
 import type { CollaborationMode } from "./collaboration-mode"
 import { useModal } from "@/components/providers/modal-provider"
-import InputAreaSimplified from "./input/input-area-simplified"
 
 export default function ChatInterface() {
   const [inputValue, setInputValue] = useState("")
@@ -41,7 +41,6 @@ export default function ChatInterface() {
   const mainContainerRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([])
-  const [isActivitySidebarOpen, setIsActivitySidebarOpen] = useState(false) // Declared the variable here
 
   // New feature states
   const [showOnboarding, setShowOnboarding] = useState(true)
