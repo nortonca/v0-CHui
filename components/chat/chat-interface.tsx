@@ -1,11 +1,8 @@
 "use client"
 
 import type React from "react"
-
-import "ios-vibrator-pro-max"
-
 import { useState, useRef, useEffect } from "react"
-import type { Message, MessageSection, StreamingWord, UploadedImage, ActiveButtonState } from "./types"
+import type { Message, MessageSection, StreamingWord, UploadedImage, ActiveButtonState, ToolCall } from "./types"
 import { getAIResponse } from "./utils"
 import ChatHeader from "./chat-header"
 import MessageSectionComponent from "./message-section"
@@ -192,7 +189,27 @@ export default function ChatInterface() {
   const simulateAIResponse = async (userMessage: string) => {
     const response = getAIResponse(userMessage)
 
-    // Create a new message with empty content
+    // Demo thinking content
+    const thinkingContent = `Let me analyze this request carefully. The user is asking about "${userMessage}". I should consider multiple perspectives and provide a comprehensive response. First, I'll break down the key components of the question, then explore relevant context and connections. This will help me formulate a well-structured and informative answer.`
+
+    // Demo tool calls
+    const demoToolCalls: ToolCall[] = [
+      {
+        id: `tool-${Date.now()}-1`,
+        name: "Web Search",
+        status: "running",
+        input: userMessage,
+      },
+      {
+        id: `tool-${Date.now()}-2`,
+        name: "Knowledge Base Query",
+        status: "completed",
+        input: `Query: ${userMessage.substring(0, 50)}...`,
+        output: "Found relevant information in the knowledge base. Retrieved 3 documents with high relevance scores.",
+      },
+    ]
+
+    // Create a new message with thinking and tool calls
     const messageId = Date.now().toString()
     setStreamingMessageId(messageId)
 
@@ -202,6 +219,9 @@ export default function ChatInterface() {
         id: messageId,
         content: "",
         type: "system",
+        thinking: thinkingContent,
+        thinkingComplete: false,
+        toolCalls: demoToolCalls,
       },
     ])
 
@@ -209,7 +229,30 @@ export default function ChatInterface() {
     setTimeout(() => {
       // Add vibration when streaming begins
       navigator.vibrate(50)
-    }, 200) // 200ms delay to make it distinct from the first vibration
+    }, 200)
+
+    // Simulate thinking completion
+    await new Promise((resolve) => setTimeout(resolve, 800))
+    
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId
+          ? {
+              ...msg,
+              thinkingComplete: true,
+              toolCalls: msg.toolCalls?.map((tool) =>
+                tool.status === "running"
+                  ? {
+                      ...tool,
+                      status: "completed" as const,
+                      output: "Search completed successfully. Found relevant results.",
+                    }
+                  : tool
+              ),
+            }
+          : msg
+      )
+    )
 
     // Stream the text
     await simulateTextStreaming(response)

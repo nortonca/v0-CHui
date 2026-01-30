@@ -6,6 +6,8 @@ import type { Message } from "./types"
 import { RefreshCcw, Copy, Share2, ThumbsUp, ThumbsDown } from "lucide-react"
 import type { StreamingWord } from "./types"
 import ImageViewer from "./image-viewer"
+import ThinkingDisplay from "./thinking-display"
+import ToolCallDisplay from "./tool-call-display"
 
 interface MessageProps {
   message: Message
@@ -55,6 +57,20 @@ export default function MessageComponent({
             </div>
           ))}
         </div>
+      )}
+
+      {/* Show thinking display for AI messages */}
+      {message.type === "system" && message.thinking && (
+        <ThinkingDisplay
+          content={message.thinking}
+          isStreaming={!message.thinkingComplete}
+          isExpanded={false}
+        />
+      )}
+
+      {/* Show tool calls for AI messages */}
+      {message.type === "system" && message.toolCalls && message.toolCalls.length > 0 && (
+        <ToolCallDisplay toolCalls={message.toolCalls} />
       )}
 
       <div

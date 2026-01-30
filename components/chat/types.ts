@@ -7,6 +7,15 @@ export interface ActiveButtonState {
 }
 export type MessageType = "user" | "system"
 
+export interface ToolCall {
+  id: string
+  name: string
+  status: "running" | "completed" | "error"
+  input?: string
+  output?: string
+  timestamp?: number
+}
+
 export interface Message {
   id: string
   content: string
@@ -14,6 +23,9 @@ export interface Message {
   completed?: boolean
   newSection?: boolean
   images?: UploadedImage[]
+  thinking?: string
+  thinkingComplete?: boolean
+  toolCalls?: ToolCall[]
 }
 
 export interface UploadedImage {
