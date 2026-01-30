@@ -15,6 +15,7 @@ import CollaborationModeToggle, { type CollaborationMode } from "../collaboratio
 import ComposerTray from "./composer-tray"
 import ImagePreview from "./image-preview"
 import VoiceModeModal from "@/components/voice/voice-mode-modal"
+import QuickActions from "../quick-actions"
 
 interface ComposerProps {
   inputValue: string
@@ -317,6 +318,18 @@ export function Composer({
           <ImagePreview 
             images={uploadedImages} 
             onRemove={handleRemoveImage} 
+          />
+        )}
+
+        {/* Quick Actions - show when input is empty and no panels open */}
+        {!hasContent && !activePanel && !isTrayOpen && (
+          <QuickActions
+            onActionSelect={(prompt) => {
+              setInputValue(prompt)
+              textareaRef.current?.focus()
+            }}
+            isStreaming={isStreaming}
+            className="mb-3"
           />
         )}
 
