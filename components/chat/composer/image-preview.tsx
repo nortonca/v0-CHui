@@ -14,33 +14,36 @@ export default function ImagePreview({ images, onRemove }: ImagePreviewProps) {
   if (images.length === 0) return null
 
   return (
-    <div className="mb-3 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+    <div className="mb-3 pt-2 pr-2 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
       {images.map((image) => (
         <div
           key={image.id}
           className="relative flex-shrink-0 group"
         >
-          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border border-border bg-muted">
+          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border border-border bg-muted shadow-sm">
             <Image
               src={image.thumbnail || image.url}
               alt="Uploaded image"
               fill
-              className="object-cover"
+              className="object-cover transition-transform group-hover:scale-105"
             />
+            {/* Hover overlay */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
           </div>
+          {/* X button - positioned inside bounds with padding */}
           <button
             type="button"
             onClick={() => onRemove(image.id)}
             className={cn(
-              "absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full",
-              "bg-destructive text-destructive-foreground",
+              "absolute -top-2 -right-2 w-6 h-6 rounded-full",
+              "bg-card border border-border shadow-md",
+              "text-muted-foreground hover:text-destructive hover:border-destructive/30",
               "flex items-center justify-center",
-              "opacity-0 group-hover:opacity-100 sm:opacity-100",
-              "transition-opacity shadow-sm"
+              "transition-all duration-150"
             )}
             aria-label="Remove image"
           >
-            <X className="w-3 h-3" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       ))}
