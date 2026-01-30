@@ -453,3 +453,8 @@ textarea::-webkit-scrollbar-thumb:hover {
 .dark .prose :where(pre):not(:where([class~="not-prose"],[class~="not-prose"] *)) {
   background-color: var(--muted);
 }
+
+/* Gradient utilities for voice mode */
+.bg-gradient-radial {
+  background-image: radial-gradient(circle, var(--tw-gradient-stops));
+}

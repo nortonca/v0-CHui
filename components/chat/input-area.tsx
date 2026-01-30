@@ -13,6 +13,7 @@ import SearchButton from "./buttons/search-button"
 import ThinkButton from "./buttons/think-button"
 import VoiceToggleButton from "./buttons/voice-toggle-button"
 import SendButton from "./buttons/send-button"
+import VoiceModeModal from "@/components/voice/voice-mode-modal"
 
 interface InputAreaProps {
   inputValue: string
@@ -40,6 +41,7 @@ export default function InputArea({
   setUploadedImages,
 }: InputAreaProps) {
   const [hasTyped, setHasTyped] = useState(false)
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false)
   const inputContainerRef = useRef<HTMLDivElement>(null)
   const selectionStateRef = useRef<{ start: number | null; end: number | null }>({ start: null, end: null })
 
@@ -229,10 +231,7 @@ export default function InputArea({
                 {!hasTyped && uploadedImages.length === 0 ? (
                   <VoiceToggleButton
                     isStreaming={isStreaming}
-                    onClick={() => {
-                      // Voice mode toggle logic
-                      console.log("[v0] Voice mode activated")
-                    }}
+                    onClick={() => setIsVoiceModalOpen(true)}
                   />
                 ) : (
                   <SendButton
@@ -247,6 +246,12 @@ export default function InputArea({
           </div>
         </div>
       </form>
+
+      {/* Voice Mode Modal */}
+      <VoiceModeModal 
+        isOpen={isVoiceModalOpen} 
+        onClose={() => setIsVoiceModalOpen(false)} 
+      />
     </div>
   )
 }
