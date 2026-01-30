@@ -15,6 +15,8 @@ import ThinkButton from "./buttons/think-button"
 import VoiceToggleButton from "./buttons/voice-toggle-button"
 import SendButton from "./buttons/send-button"
 import VoiceModeModal from "@/components/voice/voice-mode-modal"
+import TaskPanel, { type Task } from "./task-panel"
+import { ListTodo } from "lucide-react"
 
 interface InputAreaProps {
   inputValue: string
@@ -43,6 +45,8 @@ export default function InputArea({
 }: InputAreaProps) {
   const [hasTyped, setHasTyped] = useState(false)
   const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false)
+  const [isTaskPanelExpanded, setIsTaskPanelExpanded] = useState(false)
+  const [tasks, setTasks] = useState<Task[]>([])
   const inputContainerRef = useRef<HTMLDivElement>(null)
   const selectionStateRef = useRef<{ start: number | null; end: number | null }>({ start: null, end: null })
 
@@ -175,6 +179,37 @@ export default function InputArea({
     setUploadedImages(uploadedImages.filter((img) => img.id !== id))
   }
 
+  // Task management functions
+  const handleTaskToggle = (id: string) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    )
+  }
+
+  const handleTaskAdd = (text: string) => {
+    const newTask: Task = {
+      id: `task-${Date.now()}`,
+      text,
+      completed: false,
+      addedBy: "user",
+    }
+    setTasks((prev) => [...prev, newTask])
+  }
+
+  const handleTaskEdit = (id: string, text: string) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, text } : task
+      )
+    )
+  }
+
+  const handleTaskDelete = (id: string) => {
+    setTasks((prev) => prev.filter((task) => task.id !== id))
+  }
+
   return (
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-background">
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
@@ -194,6 +229,18 @@ export default function InputArea({
           )}
           onClick={handleInputContainerClick}
         >
+          {/* Task Panel */}
+          <TaskPanel
+            isExpanded={isTaskPanelExpanded}
+            onToggle={() => setIsTaskPanelExpanded(!isTaskPanelExpanded)}
+            tasks={tasks}
+            onTaskToggle={handleTaskToggle}
+            onTaskAdd={handleTaskAdd}
+            onTaskEdit={handleTaskEdit}
+            onTaskDelete={handleTaskDelete}
+            isMobile={isMobile}
+          />
+
           <div className="pb-9">
             <TextareaInput
               textareaRef={textareaRef}
@@ -233,6 +280,26 @@ export default function InputArea({
                   }}
                   isStreaming={isStreaming}
                 />
+
+                {/* Task Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsTaskPanelExpanded(!isTaskPanelExpanded)}
+                  className={cn(
+                    "rounded-full h-8 px-3 flex items-center border border-border gap-1.5 transition-colors bg-background",
+                    isTaskPanelExpanded && "bg-primary/10 border-primary/20",
+                    tasks.length > 0 && !isTaskPanelExpanded && "border-primary/50"
+                  )}
+                  disabled={isStreaming}
+                  aria-label="Toggle tasks"
+                >
+                  <ListTodo className={cn("h-4 w-4 text-muted-foreground", isTaskPanelExpanded && "text-primary")} />
+                  {tasks.length > 0 && (
+                    <span className={cn("text-xs font-medium", isTaskPanelExpanded ? "text-primary" : "text-muted-foreground")}>
+                      {tasks.filter(t => t.completed).length}/{tasks.length}
+                    </span>
+                  )}
+                </button>
 
                 {/* Display selected tools as chips */}
                 {activeButtons.selectedTools.length > 0 && (
