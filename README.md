@@ -1,215 +1,342 @@
-# Chat UI with Vibration - Co-Working Assistant
+# Chat UI with Haptic Feedback & AI Agent
 
-A collaborative AI assistant interface designed to feel like a **shared workspace with an intelligent partner**, emphasizing visibility, trust, and collaboration.
+A modern, production-ready chat application with real-time AI responses, iOS/Grok-inspired design, advanced composer features, voice mode with 3D visualization, and haptic feedback.
 
-## 🎯 Design Philosophy
+## ✨ Highlights
 
-This application makes complex AI functionality feel **simple, intuitive, and delightful** by:
-- **Progressive disclosure** - Advanced features revealed contextually
-- **Duolingo-inspired gamification** - Celebratory moments and momentum-building
-- **Figma-inspired UX** - Contextual panels and real-time collaboration feel
-- **Trust through transparency** - Memory, activity, and checkpoints are always visible
+- **🤖 Real AI Integration** - Fireworks AI (Kimi 2.5) with streaming responses via AI SDK v6
+- **📱 iOS-Style Design** - Message bubbles, smooth animations, proper spacing and layout
+- **🎨 Orange Design System** - Warm, energetic brand with semantic design tokens
+- **📸 Image Management** - Upload, preview, lightbox with rotation and keyboard navigation
+- **🎤 Voice Mode** - 3D particle sphere with real-time audio visualization
+- **📳 Haptic Feedback** - iOS-style vibrations on key interactions
+- **⚙️ Advanced Settings** - AI behavior, communication style, question frequency
+- **🔧 Clean Architecture** - Component splitting, hooks, proper state management
 
 ---
 
-## 📚 Documentation Index
+## 📚 Complete Documentation
 
-### Getting Started
-- **[CONVENTIONS.md](./CONVENTIONS.md)** - Code style, naming conventions, and file organization
-- **[DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)** - Colors, typography, spacing, and component patterns
+### 🚀 Getting Started
+- **[PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)** - Complete project guide with architecture, patterns, and examples (718 lines)
+- **[AGENT_SETUP.md](docs/AGENT_SETUP.md)** - AI integration guide, API setup, and troubleshooting (233 lines)
+- **[IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md)** - Architecture decisions and key changes (193 lines)
 
-### Architecture & Implementation
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Technical architecture, state management, and component hierarchy
-- **[REFACTORING.md](./REFACTORING.md)** - Input area refactoring and modular design improvements
-- **[FEATURES.md](./FEATURES.md)** - Complete feature reference with usage and implementation status
+### 🎨 Design & UI/UX
+- **[UI_UX_STYLE_GUIDE.md](docs/UI_UX_STYLE_GUIDE.md)** - Design system, color palette, component patterns, animations (277 lines)
+- **[COMPONENT_REFERENCE.md](docs/COMPONENT_REFERENCE.md)** - API reference for all components with props and examples (844 lines)
 
-### Design Guidelines
-- **[docs/DESIGN_PHILOSOPHY.md](./docs/DESIGN_PHILOSOPHY.md)** - Core design principles inspired by Duolingo and Figma
-- **[docs/PROGRESSIVE_DISCLOSURE.md](./docs/PROGRESSIVE_DISCLOSURE.md)** - When and how to hide complexity
-- **[docs/GAMIFICATION.md](./docs/GAMIFICATION.md)** - Celebration animations, micro-interactions, and delightful moments
-- **[docs/COLLABORATION_UX.md](./docs/COLLABORATION_UX.md)** - Language, visibility, and trust patterns
+### 🏗️ Code Organization
+- **[FILE_ORGANIZATION.md](docs/FILE_ORGANIZATION.md)** - 200-line rule, component architecture, best practices (416 lines)
+- **[REFACTORING_ROADMAP.md](docs/REFACTORING_ROADMAP.md)** - Step-by-step plan for splitting large files (471 lines)
 
-### Feature Documentation
-- **[docs/CORE_FEATURES.md](./docs/CORE_FEATURES.md)** - Detailed feature overview with visual designs
-- **[docs/FEATURE_SPECS.md](./docs/FEATURE_SPECS.md)** - Technical specifications, user stories, and data models
-- **[docs/ROADMAP.md](./docs/ROADMAP.md)** - Development roadmap and future enhancements
+### 📖 Legacy Documentation
+- **[CONVENTIONS.md](./CONVENTIONS.md)** - Original code conventions
+- **[DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)** - Original design system
+- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Original architecture
+- **[FEATURES.md](./FEATURES.md)** - Original feature reference
 
 ---
 
 ## 🚀 Core Features
 
-### Safety & Trust
-- **Checkpoints** - Visual timeline with instant restore capability
-- **Memory Panel** - Transparent, editable context the assistant uses
-- **Activity Feed** - Real-time log of agent actions and background tasks
+### 💬 Chat & Messaging
+- **Real-time AI Responses** - Streaming from Fireworks AI (Kimi 2.5 model)
+- **iOS-Style Message Bubbles** - User messages with orange primary color, AI messages with card background
+- **Message Actions** - Regenerate, copy, share, like/dislike buttons
+- **Proper Scroll Handling** - Flex-based layout with spacer div prevents content hiding under input
+- **Message Sections** - Smart grouping with proper spacing (mb-4 between messages)
+- **Thinking Display** - Shows AI reasoning process when enabled
+- **Tool Call Display** - Visualizes when AI uses tools
 
-### Efficiency & Flow
-- **Quick Actions** - One-click prompts for common tasks (Summarize, Plan, Review)
-- **Playbooks** - Reusable workflows for repeated patterns
-- **Sub-Agents** - Parallel background assistants for non-blocking work
+### 📝 Advanced Composer
+- **Minimal Input Design** - Clean textarea with plus button for features
+- **Expandable Tray** - Grid layout showing all available features with active badges
+- **Feature Panels** - Memory/Notebook, Tasks, Think levels, Tools, Playbooks, Checkpoints
+- **Quick Actions** - One-tap prompts (Summarize, Plan, Review, Research, Follow-up, Brainstorm)
+- **Image Upload** - Drag-and-drop with thumbnail preview
+- **Voice Input** - Speech-to-text with proper orange recording state (not flashing)
+- **Auto-resize Textarea** - Grows with content up to max height
+- **Keyboard Shortcuts** - Enter to send, Shift+Enter for new line
 
-### Onboarding & Personalization
-- **Onboarding Flow** - 4-step wizard to personalize assistant and set collaboration mode
-- **Collaboration Modes** - Lead (autonomous), Collaborate (back-and-forth), Assist (user-driven)
-- **Scheduled Tasks** - Optional recurring check-ins, summaries, and reminders
+### 🖼️ Image Management
+- **Upload Preview** - Thumbnail strip with zoom icon on hover
+- **Rotation** - Rotate button on each thumbnail (90° increments)
+- **Lightbox Modal** - Full-screen viewer with proper modal styling
+- **Navigation** - Arrow buttons and keyboard shortcuts (←/→)
+- **Image Counter** - Shows current image number (e.g., "2 / 5")
+- **Keyboard Hints** - ESC to close, arrow keys to navigate
+- **Remove Button** - X button with hover state on each thumbnail
+
+### 🎤 Voice Mode
+- **3D Particle Sphere** - React Three Fiber visualization
+- **Audio Reactivity** - Particles respond to microphone input
+- **Real-time Analysis** - Web Audio API frequency and amplitude detection
+- **Recording Controls** - Start/stop with visual feedback
+- **Keyboard Mode** - Toggle text input within voice mode
+- **Modal Pattern** - Consistent backdrop, header, controls layout
+
+### ⚙️ Settings & Customization
+- **Execution Mode** - Autonomous, Collaborative, or Guided
+- **Communication Style** - Concise, Balanced, or Detailed  
+- **AI Questions** - None, Minimal, Moderate, or Thorough frequency
+- **Max Questions Slider** - Limit questions per response (0-5+)
+- **Task Planning** - Auto, Always, or Never show breakdowns
+- **Memory Toggle** - Enable/disable conversation memory
+- **Preferences** - Auto-apply changes, challenge ideas
+- **Modular Design** - Split into reusable section components
+
+### 🎨 Design Features
+- **Orange Primary Color** - #f97316 with proper state variants
+- **Semantic Design Tokens** - bg-card, border-border, text-foreground
+- **Consistent Modals** - Blur backdrop, card container, header pattern
+- **Smooth Animations** - animate-scaleIn, animate-fadeIn, transitions
+- **Proper Button States** - Border, background, text color changes on hover/active
+- **Touch Targets** - Minimum 44px for mobile usability
+- **Haptic Feedback** - iOS-style vibrations on key actions
 
 ---
 
-## 🎨 Design Highlights
+## 🏗️ Architecture & Tech Stack
 
-### Duolingo Inspiration
-- Progress visualization through checkpoint timelines
-- Encouraging feedback on task completion
-- Bite-sized interactions via Quick Actions
-- Streak-like momentum with scheduled tasks
+### Core Technologies
+- **Next.js 16** - React framework with App Router
+- **React 19** - Latest with concurrent features
+- **TypeScript** - Full type safety
+- **Tailwind CSS v4** - Design system with `@theme inline`
+- **AI SDK v6** - Vercel AI SDK for streaming
+- **Fireworks AI** - Kimi 2.5 language model
 
-### Figma Inspiration
-- Expandable panels reveal context on demand
-- Properties sidebar pattern for tools/settings
-- Command palette feel with Quick Actions
-- Real-time collaboration indicators
+### UI & Components
+- **Shadcn UI** - Accessible component primitives
+- **Radix UI** - Unstyled, accessible base components
+- **Lucide Icons** - Consistent icon system
+- **React Three Fiber** - 3D voice visualization
+- **Streamdown** - Markdown streaming renderer
 
-### Gamification Elements
-- ✨ **Task completion** - Smooth checkmark animation with bounce
-- 🎉 **Checkpoint saves** - Brief green glow on save
-- 🎊 **Playbook completion** - Confetti effect (future)
-- 🔥 **Daily streaks** - Scheduled task completion tracking (future)
+### Audio & Interaction
+- **Web Audio API** - Real-time audio analysis
+- **ios-vibrator-pro-max** - Haptic feedback patterns
+- **MediaRecorder API** - Voice input capture
+
+### Component Architecture
+```
+app/
+├── api/chat/route.ts           # Streaming AI endpoint
+├── layout.tsx                  # Fonts, providers, theme
+└── page.tsx                    # Main ChatInterface
+
+components/
+├── chat/
+│   ├── chat-interface.tsx      # Main container (642 lines - needs split)
+│   ├── message.tsx             # iOS-style message bubbles
+│   ├── message-section.tsx     # Message grouping
+│   ├── composer/
+│   │   ├── composer.tsx        # Input system (474 lines - needs split)
+│   │   ├── composer-tray.tsx   # Feature selection grid
+│   │   └── image-preview.tsx   # Upload preview + lightbox (264 lines - needs split)
+│   ├── hooks/                  # Custom hooks for logic
+│   ├── *-panel.tsx            # Feature panels
+│   └── ai-utils.ts            # Streaming helpers
+├── settings/
+│   ├── settings-modal-content.tsx  # Main settings (212 lines - acceptable)
+│   ├── settings-section.tsx        # Reusable components
+│   └── settings-constants.ts       # Configuration options
+├── voice/
+│   ├── voice-mode-modal.tsx   # Voice UI (217 lines - needs split)
+│   └── particle-sphere.tsx    # 3D visualization
+└── ui/                        # Shadcn components
+
+lib/
+├── agent/base-agent.ts        # AI agent configuration
+└── utils.ts                   # Global utilities
+```
+
+### State Management Pattern
+- **Local State** - `useState` for component-only state
+- **Custom Hooks** - Extracted logic (useChatMessages, useChatStreaming, etc.)
+- **Context API** - Theme, modals (via modal-provider)
+- **Server State** - AI SDK handles streaming state
+
+### Layout Strategy
+- **Flexbox First** - Most layouts use `flex` with `gap`
+- **Proper Scroll Container** - `flex-1 min-h-0` pattern with spacer div
+- **Mobile First** - Design for mobile, enhance for desktop
+- **Semantic HTML** - `<main>`, `<header>`, proper ARIA labels
 
 ---
 
-## 🏗️ Technical Architecture
+## 🚀 Getting Started
 
-### Component Structure
+### Prerequisites
+- Node.js 18+
+- npm or pnpm
+- Fireworks AI API key ([Get one here](https://fireworks.ai))
+
+### Installation
+
+```bash
+# Clone repository
+git clone <your-repo-url>
+cd chat-ui
+
+# Install dependencies
+npm install
+
+# Set up environment
+cp .env.example .env.local
+
+# Add your API key
+# FIREWORKS_API_KEY=your_key_here
 ```
-ChatInterface
-├── OnboardingModal (first-run)
-├── ChatHeader (with Activity button)
-├── MessageSection
-└── InputAreaSimplified
-    ├── QuickActions (above input)
-    ├── InputBar
-    │   ├── ImageUpload
-    │   ├── TextareaInput
-    │   ├── InputControls (tools, panels, mode)
-    │   └── InputActions (mic, voice, send)
-    ├── MemoryPanel (expandable)
-    ├── TaskPanel (expandable)
-    ├── PlaybooksPanel (expandable)
-    └── CheckpointsPanel (expandable)
+
+### Development
+
+```bash
+# Start dev server
+npm run dev
+
+# Open http://localhost:3000
 ```
 
-### State Management
-- **ChatInterface** - Owns all feature state (memories, tasks, playbooks, checkpoints)
-- **InputArea** - Manages panel expansion and delegates data operations
-- **Modal Provider** - Centralized modal system for Think, Tools, Settings, Activity
+### Environment Variables
 
-### Styling
-- **Tailwind CSS v4** with `@theme inline` configuration
-- **Design tokens** for semantic colors (background, foreground, primary, etc.)
-- **Animations** using CSS keyframes and Tailwind utilities
+```env
+# Required
+FIREWORKS_API_KEY=your_fireworks_api_key
+
+# Optional (future)
+DATABASE_URL=your_database
+AUTH_SECRET=your_secret
+```
 
 ---
 
 ## 🛠️ Development Guidelines
 
-### Code Quality Principles
-1. **Modularity** - Components should have a single, clear responsibility
-2. **Prop Minimization** - Reduce prop drilling; use composition
-3. **Type Safety** - Export and reuse TypeScript types consistently
-4. **Predictable Patterns** - Follow established modal, panel, and button patterns
+### Code Organization (200-Line Rule)
+Files should not exceed 200 lines. When they do:
+1. Extract hooks to separate files
+2. Split UI into smaller components  
+3. Move utilities to helper files
+4. Create wrapper components for composition
+
+See **[FILE_ORGANIZATION.md](docs/FILE_ORGANIZATION.md)** and **[REFACTORING_ROADMAP.md](docs/REFACTORING_ROADMAP.md)** for detailed plans.
+
+### Component Design Principles
+1. **Single Responsibility** - Each component does ONE thing
+2. **Composition Over Props** - Build complex UIs from simple pieces
+3. **Clear Interfaces** - Well-defined TypeScript props
+4. **Proper State Co-location** - State lives closest to where it's used
+
+### Styling Guidelines
+- Use semantic design tokens (`bg-card`, `text-foreground`, `border-border`)
+- Orange primary color (#f97316) for brand elements
+- Consistent button patterns: `border border-border bg-background hover:bg-muted`
+- Modal pattern: blur backdrop + card container + header with close button
+- Touch targets: minimum 44px (`h-11 w-11` or larger)
+
+See **[UI_UX_STYLE_GUIDE.md](docs/UI_UX_STYLE_GUIDE.md)** for complete guidelines.
 
 ### Adding New Features
-1. Check **[docs/PROGRESSIVE_DISCLOSURE.md](./docs/PROGRESSIVE_DISCLOSURE.md)** for visibility guidelines
-2. Reference **[docs/GAMIFICATION.md](./docs/GAMIFICATION.md)** for delightful interactions
-3. Follow component patterns in **[ARCHITECTURE.md](./ARCHITECTURE.md)**
-4. Update **[docs/FEATURE_SPECS.md](./docs/FEATURE_SPECS.md)** with technical details
+1. Check existing patterns in **[COMPONENT_REFERENCE.md](docs/COMPONENT_REFERENCE.md)**
+2. Follow design system in **[UI_UX_STYLE_GUIDE.md](docs/UI_UX_STYLE_GUIDE.md)**
+3. Keep files under 200 lines
+4. Update documentation
 
-### Design Checklist
-- [ ] Does it follow progressive disclosure?
-- [ ] Is the visual hierarchy clear?
-- [ ] Are there celebratory moments?
-- [ ] Does it feel collaborative (not command-driven)?
-- [ ] Is it mobile-responsive?
-- [ ] Are animations purposeful (not decorative)?
-
----
-
-## 📖 Key Concepts
-
-### Co-Working Assistant Pattern
-This isn't a chatbot or command-line tool. It's a **partner**:
-- Uses "we" language instead of "I" or "you"
-- Shows its work through Activity Feed
-- Asks for input, doesn't assume
-- Celebrates successes together
-- Admits when it needs help
-
-### Progressive Disclosure
-Complexity is hidden by default, revealed contextually:
-- **First use**: Simple input, Quick Actions, basic chat
-- **Explorers**: Discover expandable panels (Memory, Tasks)
-- **Power users**: Find Playbooks, Checkpoints, Scheduled Tasks
-- **Experts**: Create custom playbooks, configure sub-agents
-
-### Trust Through Transparency
-Every AI decision is visible and reversible:
-- **Memory Panel** shows what context is being used
-- **Activity Feed** shows what the assistant is doing
-- **Checkpoints** allow instant rollback to any state
-- **Edit controls** let users correct AI mistakes
+### Testing Checklist
+- [ ] Works on mobile and desktop
+- [ ] Keyboard navigation functional
+- [ ] Proper loading/error states
+- [ ] Haptic feedback where appropriate
+- [ ] Animations smooth and purposeful
+- [ ] TypeScript types exported and reused
 
 ---
 
-## 🔮 Future Enhancements
+## 🎯 Recent Major Changes
 
-See **[docs/ROADMAP.md](./docs/ROADMAP.md)** for the complete development plan.
+This session focused on:
 
-### Phase 1: Polish & Delight (Next)
-- Confetti on task/playbook completion
-- Checkpoint timeline animations
-- Hover state micro-interactions
-- Empty state illustrations
+### UI/UX Improvements
+- ✅ iOS/Grok-style message bubbles with proper spacing
+- ✅ Composer refactored with minimal input + expandable tray
+- ✅ Image preview with lightbox, rotation, and keyboard navigation
+- ✅ Microphone button with proper orange state (not flashing red)
+- ✅ Proper scroll handling with spacer div (no hardcoded padding)
+- ✅ Message actions always visible (regenerate, copy, share, like/dislike)
 
-### Phase 2: Power User Features
-- Custom playbook creation
-- Checkpoint branching/comparison
-- Advanced memory filters
-- Keyboard shortcuts
+### Settings & Configuration
+- ✅ Settings modal refactored into reusable section components
+- ✅ AI Questions setting added (frequency + max questions slider)
+- ✅ Modular design with SettingsSection, SettingsRadioGroup, SettingsToggle, SettingsSlider
 
-### Phase 3: Collaboration & Sharing
-- Export conversations
-- Share playbooks with team
-- Collaborative checkpoints
-- Real-time co-working
+### AI Integration
+- ✅ Real AI agent using Fireworks AI (Kimi 2.5)
+- ✅ AI SDK v6 integration with streaming
+- ✅ API route at `/api/chat` with proper error handling
+- ✅ Custom streaming parser for AI SDK v6 data format
 
----
-
-## 🎓 Learning Resources
-
-### Internal Documentation
-- Start with **[docs/DESIGN_PHILOSOPHY.md](./docs/DESIGN_PHILOSOPHY.md)** to understand the "why"
-- Read **[docs/CORE_FEATURES.md](./docs/CORE_FEATURES.md)** for feature overview
-- Reference **[ARCHITECTURE.md](./ARCHITECTURE.md)** for technical implementation
-
-### External Inspiration
-- [Duolingo Design](https://blog.duolingo.com/tag/design/) - Gamification patterns
-- [Figma's Design System](https://www.figma.com/community/file/928108847914589057) - UI patterns
-- [Stripe's Design Principles](https://stripe.com/blog/payment-api-design) - Progressive disclosure
-- [Linear's Interface](https://linear.app) - Keyboard-first, delightful interactions
+### Documentation
+- ✅ PROJECT_OVERVIEW.md - Complete guide (718 lines)
+- ✅ COMPONENT_REFERENCE.md - All components documented (844 lines)
+- ✅ UI_UX_STYLE_GUIDE.md - Design system (277 lines)
+- ✅ AGENT_SETUP.md - AI integration guide (233 lines)
+- ✅ FILE_ORGANIZATION.md - Code structure (416 lines)
+- ✅ REFACTORING_ROADMAP.md - Improvement plan (471 lines)
+- ✅ IMPLEMENTATION_SUMMARY.md - Architecture decisions (193 lines)
 
 ---
 
-## 💡 Contributing
+## 📈 Roadmap
 
-When contributing, ensure:
-1. **Design-first** - Check design docs before implementing
-2. **Document changes** - Update relevant .md files
-3. **Test interactions** - Verify animations, hover states, mobile behavior
-4. **Follow patterns** - Use existing modal, panel, button components
-5. **Consider delight** - Add micro-interactions where appropriate
+### Current Phase: Refactoring
+- [ ] Split chat-interface.tsx (642 lines → ~150 each)
+- [ ] Split composer.tsx (474 lines → ~120 each)
+- [ ] Split image-preview.tsx (264 lines → ~80 each)
+- [ ] Split voice-mode-modal.tsx (217 lines → ~80 each)
+
+### Next Phase: Features
+- [ ] User authentication
+- [ ] Persistent conversation history (database)
+- [ ] Tool calling (web search, calculator, code execution)
+- [ ] Multi-modal support (document upload, PDFs)
+- [ ] Collaboration features
+
+### Future: Enhancements
+- [ ] Mobile app (React Native)
+- [ ] Desktop app (Electron)
+- [ ] Browser extension
+- [ ] Public API
 
 ---
 
-**Built with:** Next.js 15, React, TypeScript, Tailwind CSS v4, Shadcn UI
+## 🐛 Known Issues
 
-**Design inspired by:** Duolingo, Figma, Linear, Stripe
+1. **AI SDK v6 Streaming** - Custom parser needed for data format
+2. **Image Rotation** - Not persisted (resets on page reload)
+3. **Voice Mode iOS** - Safari microphone permissions tricky
+4. **Scroll Jump** - Occasional on rapid messages
+
+See troubleshooting sections in documentation.
+
+---
+
+## 📝 License
+
+MIT License - See LICENSE file
+
+---
+
+## 🙏 Acknowledgments
+
+- **Vercel** - AI SDK and Next.js
+- **Fireworks AI** - Fast, affordable LLM inference
+- **Shadcn** - Beautiful component system
+- **Tailwind Labs** - Excellent CSS framework
+
+---
+
+**Version:** 1.0.0  
+**Last Updated:** December 2024  
+**Built with ❤️ using Next.js, React, TypeScript, and AI SDK**
