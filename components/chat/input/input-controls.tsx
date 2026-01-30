@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { Brain, ListTodo, BookOpen, History } from "lucide-react"
+import { NotebookPen, ListTodo, BookOpen, History, Brain } from "lucide-react"
 import ImageButton from "../buttons/image-button"
 import ThinkButton, { type ThinkLevel } from "../buttons/think-button"
 import ToolsButton from "../buttons/tools-button"
@@ -68,7 +68,7 @@ export default function InputControls({
       {/* Divider */}
       <div className="w-px h-5 bg-border mx-1" />
 
-      {/* Memory Toggle Button */}
+      {/* Notebook Toggle Button */}
       <button
         type="button"
         onClick={() => onTogglePanel("memory")}
@@ -78,10 +78,10 @@ export default function InputControls({
           memoriesCount > 0 && !isMemoryPanelExpanded && "border-primary/50"
         )}
         disabled={isStreaming}
-        aria-label="Toggle memory"
-        title="Memory"
+        aria-label="Toggle notebook"
+        title="Notebook"
       >
-        <Brain className={cn("h-4 w-4 text-muted-foreground", isMemoryPanelExpanded && "text-primary")} />
+        <NotebookPen className={cn("h-4 w-4 text-muted-foreground", isMemoryPanelExpanded && "text-primary")} />
         {memoriesCount > 0 && (
           <span className={cn("text-xs font-medium", isMemoryPanelExpanded ? "text-primary" : "text-muted-foreground")}>
             {memoriesCount}
