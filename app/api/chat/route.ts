@@ -1,48 +1,68 @@
-import { createAgentUIStreamResponse, streamText, stepCountIs } from "ai"
-import { fireworks } from "@ai-sdk/fireworks"
-import { chatAgent } from "@/lib/agent"
+import { fireworks } from '@ai-sdk/fireworks';
+import { streamText } from 'ai';
 
-// Fireworks Kimi K2.5 model
-const kimiModel = fireworks("accounts/fireworks/models/kimi-k2p5")
+export const runtime = 'edge';
 
-export async function POST(req: Request) {
+/**
+ * Chat API endpoint
+ * 
+ * Handles streaming chat completions using Fireworks AI (Kimi 2.5).
+ * This endpoint:
+ * - Accepts messages from the UI
+ * - Streams responses back in real-time
+ * - Maintains conversation context
+ */
+export async function POST(request: Request) {
   try {
-    const body = await req.json()
-    const { messages, prompt } = body
+    const { messages } = await request.json();
 
-    // If using messages array from useChat (UIMessage format)
-    if (messages && Array.isArray(messages)) {
-      // Use createAgentUIStreamResponse for UIMessage[] from useChat
-      // IMPORTANT: Use 'uiMessages' NOT 'messages'
-      return createAgentUIStreamResponse({
-        agent: chatAgent,
-        uiMessages: messages,
-      })
+    console.log('[v0] Chat API: Received', messages?.length || 0, 'messages');
+
+    // Validate messages
+    if (!messages || !Array.isArray(messages)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request: messages array required' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
-    // If using a single prompt (non-chat mode)
-    if (prompt) {
-      const result = streamText({
-        model: kimiModel,
-        prompt,
-        stopWhen: stepCountIs(5),
-      })
-      
-      return result.toUIMessageStreamResponse()
-    }
+    // Stream response using the agent
+    const result = await streamText({
+      model: fireworks('accounts/fireworks/models/kimi-k2p5'),
+      messages,
+      system: `You are a helpful, professional AI assistant integrated into a modern chat application.
 
-    return new Response("Missing messages or prompt", { status: 400 })
+Core Characteristics:
+- Professional yet approachable tone
+- Concise but thorough responses
+- Technically competent across general topics
+- Honest about limitations
+
+Boundaries:
+- You are currently a conversational assistant
+- You do not yet have access to tools, memory persistence, or external data
+- If asked about capabilities you don't have, politely explain and offer to help in other ways
+- Never hallucinate features or abilities
+
+Communication Style:
+- Be direct and clear
+- Use markdown formatting for better readability
+- Structure complex responses with headers and lists
+- Keep initial responses focused, offer to elaborate if needed
+
+Your goal is to be genuinely helpful while maintaining clarity about your current capabilities.`,
+    });
+
+    return result.toDataStreamResponse();
   } catch (error) {
-    console.error("[v0] Chat API error:", error)
+    console.error('[v0] Chat API error:', error);
+    
     return new Response(
       JSON.stringify({ 
-        error: "Failed to process chat request",
-        details: error instanceof Error ? error.message : "Unknown error"
-      }), 
-      { 
-        status: 500,
-        headers: { "Content-Type": "application/json" }
-      }
-    )
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
   }
 }

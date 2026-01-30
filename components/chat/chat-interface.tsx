@@ -2,8 +2,8 @@
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
+import { useChat } from 'ai/react'
 import type { Message, MessageSection, StreamingWord, UploadedImage, ActiveButtonState, ToolCall } from "./types"
-import { getAIResponse } from "./utils"
 import ChatHeader from "./chat-header"
 import MessageSectionComponent from "./message-section"
 import { Composer } from "./composer"
@@ -14,6 +14,7 @@ import type { Checkpoint } from "./checkpoints-panel"
 import type { Playbook } from "./playbooks-panel"
 import type { CollaborationMode } from "./collaboration-mode"
 import { useModal } from "@/components/providers/modal-provider"
+import { getAIResponse } from './ai-utils'; // Declare the variable before using it
 
 export default function ChatInterface() {
   const [inputValue, setInputValue] = useState("")
@@ -344,7 +345,7 @@ export default function ChatInterface() {
   }
 
   const simulateAIResponse = async (userMessage: string) => {
-    const response = getAIResponse(userMessage)
+    console.log('[v0] Starting real AI response for:', userMessage);
 
     // Demo thinking content
     const thinkingContent = `Let me analyze this request carefully. The user is asking about "${userMessage}". I should consider multiple perspectives and provide a comprehensive response. First, I'll break down the key components of the question, then explore relevant context and connections. This will help me formulate a well-structured and informative answer.`
@@ -420,13 +421,54 @@ export default function ChatInterface() {
       )
     )
 
-    // Stream the text
-    await simulateTextStreaming(response)
+    // Build conversation history for context
+    const conversationHistory = messages
+      .filter(m => m.type !== 'system' || m.completed)
+      .map(m => ({
+        role: m.type === 'user' ? 'user' : 'assistant',
+        content: m.content
+      }));
+    
+    // Add current user message
+    conversationHistory.push({ role: 'user', content: userMessage });
 
-    // Update with complete message
-    setMessages((prev) =>
-      prev.map((msg) => (msg.id === messageId ? { ...msg, content: response, completed: true } : msg)),
-    )
+    // Stream real AI response
+    let fullResponse = '';
+    try {
+      const { streamAIResponse } = await import('./ai-utils');
+      
+      for await (const chunk of streamAIResponse(conversationHistory)) {
+        fullResponse += chunk;
+        
+        // Update message with streaming content
+        setMessages((prev) =>
+          prev.map((msg) => 
+            msg.id === messageId 
+              ? { ...msg, content: fullResponse } 
+              : msg
+          )
+        );
+      }
+      
+      // Mark as completed
+      setMessages((prev) =>
+        prev.map((msg) => 
+          msg.id === messageId 
+            ? { ...msg, content: fullResponse, completed: true } 
+            : msg
+        )
+      );
+    } catch (error) {
+      console.error('[v0] Real AI streaming error:', error);
+      const errorMessage = 'I apologize, but I encountered an error. Please try again.';
+      setMessages((prev) =>
+        prev.map((msg) => 
+          msg.id === messageId 
+            ? { ...msg, content: errorMessage, completed: true } 
+            : msg
+        )
+      );
+    }
 
     // Add to completed messages set to prevent re-animation
     setCompletedMessages((prev) => new Set(prev).add(messageId))
