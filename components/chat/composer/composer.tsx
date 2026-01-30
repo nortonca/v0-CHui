@@ -408,12 +408,12 @@ export function Composer({
                   "transition-all duration-200",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                   isRecording 
-                    ? "bg-destructive/10 border-destructive/30 text-destructive" 
+                    ? "bg-primary/10 border-primary/30 text-primary" 
                     : "border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground"
                 )}
                 aria-label={isRecording ? "Stop recording" : "Voice to text"}
               >
-                <Mic className={cn("w-4 h-4", isRecording && "animate-pulse")} />
+                <Mic className="w-4 h-4" />
               </button>
 
               {/* Voice Mode / Send Button */}
