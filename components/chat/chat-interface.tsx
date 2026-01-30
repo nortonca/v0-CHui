@@ -13,6 +13,7 @@ import type { Checkpoint } from "./checkpoints-panel"
 import type { Playbook } from "./playbooks-panel"
 import type { CollaborationMode } from "./collaboration-mode"
 import { useModal } from "@/components/providers/modal-provider"
+import InputAreaSimplified from "./input/input-area-simplified"
 
 export default function ChatInterface() {
   const [inputValue, setInputValue] = useState("")
@@ -562,19 +563,32 @@ export default function ChatInterface() {
         </div>
       </div>
 
-      {/* Input Area Simplified */}
-      <div>
-        <textarea
-          ref={textareaRef}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          className="border p-2"
-          placeholder="Type your message here..."
-        />
-        <button onClick={handleSubmit} disabled={isStreaming}>
-          Send
-        </button>
-      </div>
+      {/* Input Area */}
+      <InputAreaSimplified
+        inputValue={inputValue}
+        setInputValue={setInputValue}
+        handleSubmit={handleSubmit}
+        isStreaming={isStreaming}
+        isMobile={isMobile}
+        activeButtons={activeButtons}
+        setActiveButtons={setActiveButtons}
+        textareaRef={textareaRef}
+        uploadedImages={uploadedImages}
+        setUploadedImages={setUploadedImages}
+        memories={memories}
+        onMemoryEdit={handleMemoryEdit}
+        onMemoryDelete={handleMemoryDelete}
+        checkpoints={checkpoints}
+        currentCheckpointId={currentCheckpointId}
+        onCheckpointRestore={restoreCheckpoint}
+        onCheckpointCreate={() => createCheckpoint("Manual save", "User-created checkpoint")}
+        playbooks={playbooks}
+        onPlaybookRun={handlePlaybookRun}
+        onPlaybookAdd={handlePlaybookAdd}
+        onPlaybookDelete={handlePlaybookDelete}
+        collaborationMode={collaborationMode}
+        onCollaborationModeChange={setCollaborationMode}
+      />
     </div>
   )
 }
