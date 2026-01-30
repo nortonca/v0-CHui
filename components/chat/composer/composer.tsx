@@ -13,6 +13,7 @@ import type { CollaborationMode } from "../collaboration-mode"
 import ComposerTray from "./composer-tray"
 import ComposerPanels from "./composer-panels"
 import ImagePreview from "./image-preview"
+import VoiceModeModal from "@/components/voice/voice-mode-modal"
 
 interface ComposerProps {
   inputValue: string
@@ -73,8 +74,7 @@ export function Composer({
   const [activePanel, setActivePanel] = useState<string | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
   const [isRecording, setIsRecording] = useState(false)
-  const [hasTyped, setHasTyped] = useState(false)
-  const [hasContent, setHasContent] = useState(false); // Declare hasContent variable
+  const [isVoiceModeOpen, setIsVoiceModeOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   // Derived states
@@ -84,6 +84,8 @@ export function Composer({
     activeButtons.image,
   ].filter(Boolean).length
 
+  const hasContent = inputValue.trim().length > 0 || uploadedImages.length > 0
+
   // Auto-resize textarea
   useEffect(() => {
     const textarea = textareaRef.current
@@ -92,7 +94,6 @@ export function Composer({
       const newHeight = Math.max(24, Math.min(textarea.scrollHeight, 200))
       textarea.style.height = `${newHeight}px`
     }
-    setHasContent(inputValue.trim().length > 0); // Update hasContent state
   }, [inputValue, textareaRef])
 
   // Close tray when clicking outside
@@ -168,8 +169,32 @@ export function Composer({
   }
 
   const handleMicrophoneClick = () => {
-    console.log("Microphone button clicked");
-    // Implement microphone functionality here
+    if (isRecording) {
+      // Stop recording
+      setIsRecording(false)
+    } else {
+      // Start recording - simulate for now
+      setIsRecording(true)
+      
+      // Haptic feedback
+      if (navigator.vibrate) {
+        navigator.vibrate(50)
+      }
+      
+      // Simulate stopping after 3 seconds with transcribed text
+      setTimeout(() => {
+        setIsRecording(false)
+        setInputValue(inputValue + (inputValue ? " " : "") + "This is simulated voice input.")
+      }, 3000)
+    }
+  }
+
+  const handleVoiceModeClick = () => {
+    // Haptic feedback
+    if (navigator.vibrate) {
+      navigator.vibrate(50)
+    }
+    setIsVoiceModeOpen(true)
   }
 
   // Task handlers
@@ -290,10 +315,7 @@ export function Composer({
               <textarea
                 ref={textareaRef}
                 value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                  setHasContent(e.target.value.trim().length > 0); // Update hasContent state on change
-                }}
+                onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Message..."
                 disabled={isStreaming}
@@ -356,7 +378,7 @@ export function Composer({
               ) : (
                 <button
                   type="button"
-                  onClick={() => console.log("[v0] Voice mode clicked - opening voice modal")}
+                  onClick={handleVoiceModeClick}
                   disabled={isStreaming}
                   className={cn(
                     "flex items-center justify-center",
@@ -382,6 +404,12 @@ export function Composer({
           </div>
         </form>
       </div>
+
+      {/* Voice Mode Modal */}
+      <VoiceModeModal 
+        isOpen={isVoiceModeOpen} 
+        onClose={() => setIsVoiceModeOpen(false)} 
+      />
     </div>
   )
 }
