@@ -6,7 +6,7 @@ import type { Message, MessageSection, StreamingWord, UploadedImage, ActiveButto
 import { getAIResponse } from "./utils"
 import ChatHeader from "./chat-header"
 import MessageSectionComponent from "./message-section"
-import InputAreaSimplified from "./input/input-area-simplified"
+import { Composer } from "./composer"
 import OnboardingModal, { type OnboardingData } from "@/components/onboarding/onboarding-modal"
 import ActivityModalContent, { type ActivityItem, type ScheduledTask } from "./activity-modal-content"
 import type { Memory } from "./memory-panel"
@@ -562,8 +562,8 @@ export default function ChatInterface() {
         </div>
       </div>
 
-      {/* Input Area */}
-      <InputAreaSimplified
+      {/* Composer - Minimal Input Bar */}
+      <Composer
         inputValue={inputValue}
         setInputValue={setInputValue}
         handleSubmit={handleSubmit}
