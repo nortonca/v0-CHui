@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { X, Trash2, Edit2, Check, Brain } from "lucide-react"
+import { X, Trash2, Edit2, Check, NotebookPen, Brain } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export interface Memory {
@@ -90,16 +90,16 @@ export default function MemoryPanel({
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <div className="flex items-center gap-2">
-              <Brain className="size-5 text-primary" />
-              <h3 className="font-semibold text-foreground">Memory</h3>
+              <NotebookPen className="size-5 text-primary" />
+              <h3 className="font-semibold text-foreground">Notebook</h3>
               <span className="text-xs text-muted-foreground">
-                {memories.length} {memories.length === 1 ? "item" : "items"}
+                {memories.length} {memories.length === 1 ? "note" : "notes"}
               </span>
             </div>
             <button
               onClick={onToggle}
               className="p-1 hover:bg-muted/50 rounded-lg transition-colors"
-              aria-label="Close memory panel"
+              aria-label="Close notebook"
             >
               <X className="size-4 text-muted-foreground" />
             </button>
@@ -134,13 +134,13 @@ export default function MemoryPanel({
             ))}
           </div>
 
-          {/* Memory List */}
+          {/* Notebook List */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3 max-h-[calc(60vh-120px)]">
             {memories.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <Brain className="size-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No memories yet</p>
-                <p className="text-xs mt-1">I'll remember important details as we talk</p>
+                <NotebookPen className="size-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No notes yet</p>
+                <p className="text-xs mt-1">{"I'll jot down important details as we work together"}</p>
               </div>
             ) : (
               Object.entries(groupedMemories).map(([category, items]) => (
