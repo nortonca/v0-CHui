@@ -5,13 +5,14 @@ import { useState, useRef, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { Send, Plus, X, Mic, Sparkles, AudioWaveform } from "lucide-react"
 import type { ActiveButtonState, UploadedImage } from "../types"
-import type { Memory } from "../memory-panel"
-import type { Checkpoint } from "../checkpoints-panel"
-import type { Playbook } from "../playbooks-panel"
-import type { Task } from "../task-panel"
-import type { CollaborationMode } from "../collaboration-mode"
+import MemoryPanel, { type Memory } from "../memory-panel"
+import CheckpointsPanel, { type Checkpoint } from "../checkpoints-panel"
+import PlaybooksPanel, { type Playbook } from "../playbooks-panel"
+import TaskPanel, { type Task } from "../task-panel"
+import ThinkPanel from "../think-panel"
+import ToolsPanel from "../tools-panel"
+import CollaborationModeToggle, { type CollaborationMode } from "../collaboration-mode"
 import ComposerTray from "./composer-tray"
-import ComposerPanels from "./composer-panels"
 import ImagePreview from "./image-preview"
 import VoiceModeModal from "@/components/voice/voice-mode-modal"
 
@@ -217,41 +218,83 @@ export function Composer({
       className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background to-transparent pt-8 pb-safe"
     >
       <div className="max-w-2xl mx-auto px-4 sm:px-6">
-        {/* Panels */}
-        <ComposerPanels
-          activePanel={activePanel}
-          onClose={() => setActivePanel(null)}
-          isMobile={isMobile}
-          // Think
-          thinkLevel={activeButtons.thinkLevel}
-          onThinkLevelChange={handleThinkLevelChange}
-          // Tools
-          selectedTools={activeButtons.selectedTools}
-          onToolsChange={handleToolsChange}
-          // Memory
-          memories={memories}
-          onMemoryEdit={onMemoryEdit}
-          onMemoryDelete={onMemoryDelete}
-          // Tasks
-          tasks={tasks}
-          onTaskToggle={handleTaskToggle}
-          onTaskAdd={handleTaskAdd}
-          onTaskEdit={handleTaskEdit}
-          onTaskDelete={handleTaskDelete}
-          // Playbooks
-          playbooks={playbooks}
-          onPlaybookRun={onPlaybookRun}
-          onPlaybookAdd={onPlaybookAdd}
-          onPlaybookDelete={onPlaybookDelete}
-          // Checkpoints
-          checkpoints={checkpoints}
-          currentCheckpointId={currentCheckpointId}
-          onCheckpointRestore={onCheckpointRestore}
-          onCheckpointCreate={onCheckpointCreate}
-          // Collaboration
-          collaborationMode={collaborationMode}
-          onCollaborationModeChange={onCollaborationModeChange}
-        />
+        {/* Panels - Using actual panel components with old UI */}
+        <div className="relative">
+          {/* Memory/Notebook Panel */}
+          <MemoryPanel
+            isExpanded={activePanel === "notebook"}
+            onToggle={() => handlePanelToggle("notebook")}
+            memories={memories}
+            onMemoryEdit={onMemoryEdit}
+            onMemoryDelete={onMemoryDelete}
+            isMobile={isMobile}
+          />
+
+          {/* Task Panel */}
+          <TaskPanel
+            isExpanded={activePanel === "tasks"}
+            onToggle={() => handlePanelToggle("tasks")}
+            tasks={tasks}
+            onTaskToggle={handleTaskToggle}
+            onTaskAdd={handleTaskAdd}
+            onTaskEdit={handleTaskEdit}
+            onTaskDelete={handleTaskDelete}
+            isMobile={isMobile}
+          />
+
+          {/* Think Panel */}
+          <ThinkPanel
+            isExpanded={activePanel === "think"}
+            onToggle={() => handlePanelToggle("think")}
+            thinkLevel={activeButtons.thinkLevel}
+            onLevelChange={handleThinkLevelChange}
+            isMobile={isMobile}
+          />
+
+          {/* Tools Panel */}
+          <ToolsPanel
+            isExpanded={activePanel === "tools"}
+            onToggle={() => handlePanelToggle("tools")}
+            selectedTools={activeButtons.selectedTools}
+            onToolsChange={handleToolsChange}
+            isMobile={isMobile}
+          />
+
+          {/* Playbooks Panel */}
+          <PlaybooksPanel
+            isExpanded={activePanel === "playbooks"}
+            onToggle={() => handlePanelToggle("playbooks")}
+            playbooks={playbooks}
+            onPlaybookRun={onPlaybookRun}
+            onPlaybookAdd={onPlaybookAdd}
+            onPlaybookDelete={onPlaybookDelete}
+            isMobile={isMobile}
+          />
+
+          {/* Checkpoints Panel */}
+          <CheckpointsPanel
+            isExpanded={activePanel === "checkpoints"}
+            onToggle={() => handlePanelToggle("checkpoints")}
+            checkpoints={checkpoints}
+            currentCheckpointId={currentCheckpointId}
+            onRestore={onCheckpointRestore}
+            onCreateCheckpoint={onCheckpointCreate}
+            isMobile={isMobile}
+          />
+
+          {/* Collaboration Mode Panel */}
+          {activePanel === "mode" && (
+            <div className={cn(
+              "absolute left-0 right-0 bottom-full mb-2 p-4 bg-card border border-border rounded-2xl shadow-lg",
+              "animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2"
+            )}>
+              <CollaborationModeToggle
+                mode={collaborationMode}
+                onModeChange={onCollaborationModeChange}
+              />
+            </div>
+          )}
+        </div>
 
         {/* Expandable Tray */}
         <ComposerTray
