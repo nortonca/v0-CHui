@@ -41,11 +41,11 @@ export default function CollaborationModeToggle({
   isCompact = false,
 }: CollaborationModeProps) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2 w-full">
       <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide px-1">
-        Mode
+        Collaboration Mode
       </div>
-      <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/50 border border-border">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-1 rounded-xl bg-muted/50 border border-border">
         {MODES.map((m) => {
           const Icon = m.icon
           const isActive = mode === m.id
@@ -56,15 +56,17 @@ export default function CollaborationModeToggle({
               type="button"
               onClick={() => onModeChange(m.id)}
               className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all text-xs font-medium whitespace-nowrap",
+                "flex items-center justify-center gap-1.5 px-3 py-2.5 sm:px-2.5 sm:py-1.5 rounded-lg transition-all text-xs sm:text-xs font-medium whitespace-nowrap flex-1 sm:flex-none",
+                "min-h-[44px] sm:min-h-auto",
                 isActive
                   ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground active:bg-muted/75"
               )}
               title={m.description}
             >
-              <Icon className="size-3.5" />
-              <span>{m.shortLabel}</span>
+              <Icon className="size-4 sm:size-3.5 flex-shrink-0" />
+              <span className="sm:hidden">{m.label}</span>
+              <span className="hidden sm:inline">{m.shortLabel}</span>
             </button>
           )
         })}

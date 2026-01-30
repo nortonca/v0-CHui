@@ -24,34 +24,34 @@ export default function ChatHeader({
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-12 flex items-center px-4 z-20 bg-background border-b border-border">
-      <div className="w-full flex items-center justify-between px-2">
+    <header className="fixed top-0 left-0 right-0 h-12 sm:h-14 flex items-center px-3 sm:px-4 z-20 bg-background border-b border-border safe-area-inset-top">
+      <div className="w-full flex items-center justify-between max-w-full">
         <Button
           variant="ghost"
           size="icon"
-          className="rounded-full h-8 w-8"
+          className="rounded-full h-10 w-10 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex-shrink-0"
           onClick={handleOpenMenu}
         >
           <Menu className="h-5 w-5 text-foreground" />
           <span className="sr-only">Menu</span>
         </Button>
 
-        <h1 className="text-base font-medium text-foreground">
+        <h1 className="text-sm sm:text-base font-medium text-foreground text-center flex-1 px-2 truncate">
           {assistantName || "Assistant"}
         </h1>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 flex-shrink-0">
           {onActivityClick && (
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full h-8 w-8 relative"
+              className="rounded-full h-10 w-10 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 relative"
               onClick={onActivityClick}
             >
               <Activity className="h-5 w-5 text-foreground" />
               {activityCount > 0 && (
                 <span className={cn(
-                  "absolute -top-0.5 -right-0.5 size-4 rounded-full",
+                  "absolute -top-0.5 -right-0.5 size-4 sm:size-4 rounded-full",
                   "bg-primary text-white text-[10px] font-medium",
                   "flex items-center justify-center"
                 )}>
@@ -61,7 +61,11 @@ export default function ChatHeader({
               <span className="sr-only">Activity</span>
             </Button>
           )}
-          <Button variant="ghost" size="icon" className="rounded-full h-8 w-8">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full h-10 w-10 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] sm:min-h-0 sm:min-w-0 flex-shrink-0"
+          >
             <PenSquare className="h-5 w-5 text-foreground" />
             <span className="sr-only">New Chat</span>
           </Button>

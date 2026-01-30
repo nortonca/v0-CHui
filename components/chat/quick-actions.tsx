@@ -70,28 +70,35 @@ export default function QuickActions({
   className,
 }: QuickActionsProps) {
   return (
-    <div className={cn("flex items-center gap-2 overflow-x-auto pb-1", className)}>
-      {QUICK_ACTIONS.map((action) => (
-        <button
-          key={action.id}
-          type="button"
-          onClick={() => onActionSelect(action.prompt)}
-          disabled={isStreaming}
-          className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-full",
-            "border border-border bg-background hover:bg-muted/50",
-            "text-sm font-medium text-foreground whitespace-nowrap",
-            "transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
-            "group"
-          )}
-          title={action.description}
-        >
-          <span className="text-muted-foreground group-hover:text-foreground transition-colors">
-            {action.icon}
-          </span>
-          {action.label}
-        </button>
-      ))}
+    <div className={cn("flex flex-col gap-2", className)}>
+      <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide px-1">
+        Quick Actions
+      </div>
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        {QUICK_ACTIONS.map((action) => (
+          <button
+            key={action.id}
+            type="button"
+            onClick={() => onActionSelect(action.prompt)}
+            disabled={isStreaming}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-2 sm:px-3 sm:py-1.5 rounded-full",
+              "border border-border bg-background hover:bg-muted/50 active:bg-muted",
+              "text-xs sm:text-sm font-medium text-foreground whitespace-nowrap flex-shrink-0",
+              "transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+              "min-h-[44px] sm:min-h-auto flex items-center",
+              "group touch-highlight-transparent"
+            )}
+            title={action.description}
+          >
+            <span className="text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0">
+              {action.icon}
+            </span>
+            <span className="hidden sm:inline">{action.label}</span>
+            <span className="sm:hidden text-xs">{action.label}</span>
+          </button>
+        ))}
+      </div>
     </div>
   )
 }
