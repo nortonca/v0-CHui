@@ -1,14 +1,24 @@
 "use client"
 
 import React, { useState } from "react"
-import { X, Zap } from "lucide-react"
+import { X, Zap, Search, Plus, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
+
+interface Tool {
+  id: string
+  name: string
+  description: string
+  category: string
+  isConnected: boolean
+  isAvailable: boolean
+  isCustom?: boolean
+}
 
 interface ToolsModalContentProps {
   onClose: () => void
 }
 
-const MOCK_TOOLS = [
+const MOCK_TOOLS: Tool[] = [
   {
     id: "web-search",
     name: "Web Search",
@@ -52,11 +62,18 @@ const CATEGORIES = [
 
 export default function ToolsModalContent({ onClose }: ToolsModalContentProps) {
   const [activeCategory, setActiveCategory] = useState("all")
-  const [tools, setTools] = useState(MOCK_TOOLS)
+  const [tools, setTools] = useState<Tool[]>(MOCK_TOOLS)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [newToolName, setNewToolName] = useState("")
+  const [newToolDescription, setNewToolDescription] = useState("")
 
-  const filteredTools = tools.filter((tool) =>
-    activeCategory === "all" ? true : tool.category === activeCategory
-  )
+  const filteredTools = tools.filter((tool) => {
+    const matchesCategory = activeCategory === "all" || tool.category === activeCategory
+    const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.description.toLowerCase().includes(searchQuery.toLowerCase())
+    return matchesCategory && matchesSearch
+  })
 
   const connectedCount = tools.filter((t) => t.isConnected).length
 
@@ -68,6 +85,25 @@ export default function ToolsModalContent({ onClose }: ToolsModalContentProps) {
           : tool
       )
     )
+  }
+
+  const handleAddTool = () => {
+    if (!newToolName.trim()) return
+
+    const newTool: Tool = {
+      id: `custom-${Date.now()}`,
+      name: newToolName,
+      description: newToolDescription || "Custom MCP tool",
+      category: "utilities",
+      isConnected: false,
+      isAvailable: true,
+      isCustom: true,
+    }
+
+    setTools((prev) => [...prev, newTool])
+    setNewToolName("")
+    setNewToolDescription("")
+    setShowAddForm(false)
   }
 
   return (
@@ -102,6 +138,24 @@ export default function ToolsModalContent({ onClose }: ToolsModalContentProps) {
           </button>
         </div>
 
+        {/* Search Bar */}
+        <div className="px-6 py-3 border-b border-border">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search tools..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className={cn(
+                "w-full pl-10 pr-4 py-2 rounded-xl border border-border bg-background",
+                "text-sm text-foreground placeholder:text-muted-foreground",
+                "focus:outline-none focus:ring-2 focus:ring-primary/20"
+              )}
+            />
+          </div>
+        </div>
+
         {/* Categories */}
         <div className="flex items-center gap-2 px-6 py-3 border-b border-border overflow-x-auto">
           {CATEGORIES.map((category) => (
@@ -122,6 +176,78 @@ export default function ToolsModalContent({ onClose }: ToolsModalContentProps) {
 
         {/* Tools List */}
         <div className="flex-1 overflow-y-auto p-4">
+          {/* Add Tool Button */}
+          {!showAddForm && (
+            <button
+              onClick={() => setShowAddForm(true)}
+              className={cn(
+                "w-full mb-3 p-4 rounded-xl border-2 border-dashed border-border",
+                "hover:border-primary/50 hover:bg-primary/5 transition-all",
+                "flex items-center justify-center gap-2 text-muted-foreground hover:text-primary"
+              )}
+            >
+              <Plus className="size-4" />
+              <span className="text-sm font-medium">Add Custom Tool</span>
+            </button>
+          )}
+
+          {/* Add Tool Form */}
+          {showAddForm && (
+            <div className="mb-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Tool name"
+                  value={newToolName}
+                  onChange={(e) => setNewToolName(e.target.value)}
+                  className={cn(
+                    "w-full px-3 py-2 rounded-lg border border-border bg-background",
+                    "text-sm text-foreground placeholder:text-muted-foreground",
+                    "focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  )}
+                />
+                <input
+                  type="text"
+                  placeholder="Description (optional)"
+                  value={newToolDescription}
+                  onChange={(e) => setNewToolDescription(e.target.value)}
+                  className={cn(
+                    "w-full px-3 py-2 rounded-lg border border-border bg-background",
+                    "text-sm text-foreground placeholder:text-muted-foreground",
+                    "focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  )}
+                />
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleAddTool}
+                    disabled={!newToolName.trim()}
+                    className={cn(
+                      "flex-1 px-3 py-2 rounded-lg bg-primary text-white",
+                      "hover:bg-primary/90 transition-colors text-sm font-medium",
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
+                      "flex items-center justify-center gap-1.5"
+                    )}
+                  >
+                    <Check className="size-4" />
+                    Add Tool
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowAddForm(false)
+                      setNewToolName("")
+                      setNewToolDescription("")
+                    }}
+                    className={cn(
+                      "px-3 py-2 rounded-lg border border-border bg-background",
+                      "hover:bg-muted/50 transition-colors text-sm font-medium text-foreground"
+                    )}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="space-y-3">
             {filteredTools.map((tool) => (
               <div
@@ -135,7 +261,7 @@ export default function ToolsModalContent({ onClose }: ToolsModalContentProps) {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <Zap className={cn(
                         "size-4",
                         tool.isConnected ? "text-primary" : "text-muted-foreground"
@@ -144,6 +270,11 @@ export default function ToolsModalContent({ onClose }: ToolsModalContentProps) {
                       {!tool.isAvailable && (
                         <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px] font-medium">
                           Coming Soon
+                        </span>
+                      )}
+                      {tool.isCustom && (
+                        <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium">
+                          Custom
                         </span>
                       )}
                     </div>
