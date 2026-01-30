@@ -323,9 +323,10 @@ export function Composer({
         {/* Main Input */}
         <form onSubmit={handleSubmit} className="relative">
           <div className={cn(
-            "relative flex items-end gap-2 sm:gap-3 p-2 sm:p-3",
-            "bg-card border border-border rounded-2xl sm:rounded-3xl",
-            "shadow-lg transition-all duration-200",
+            "relative flex items-end gap-3 p-3",
+            "bg-card border border-border rounded-2xl",
+            "shadow-sm transition-all duration-200",
+            "focus-within:border-primary/30 focus-within:shadow-md",
             isStreaming && "opacity-70"
           )}>
             {/* Plus Button - Opens Tray */}
@@ -336,25 +337,26 @@ export function Composer({
                 setActivePanel(null)
               }}
               className={cn(
-                "relative flex-shrink-0 flex items-center justify-center",
-                "w-10 h-10 sm:w-9 sm:h-9 rounded-full",
-                "bg-muted/50 hover:bg-muted active:bg-muted/75",
+                "relative flex-shrink-0 flex items-center justify-center self-end",
+                "w-9 h-9 rounded-full border",
+                "border-border bg-background hover:bg-muted",
+                "text-muted-foreground hover:text-foreground",
                 "transition-all duration-200",
-                isTrayOpen && "bg-primary/10 text-primary rotate-45"
+                isTrayOpen && "bg-primary/10 border-primary/30 text-primary rotate-45"
               )}
               aria-label={isTrayOpen ? "Close options" : "Open options"}
             >
               <Plus className="w-5 h-5" />
               {/* Active feature badge */}
               {activeFeatureCount > 0 && !isTrayOpen && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
                   {activeFeatureCount}
                 </span>
               )}
             </button>
 
             {/* Textarea */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 self-center">
               <textarea
                 ref={textareaRef}
                 value={inputValue}
@@ -365,18 +367,18 @@ export function Composer({
                 rows={1}
                 className={cn(
                   "w-full bg-transparent border-0 outline-none resize-none",
-                  "text-base sm:text-[15px] text-foreground placeholder:text-muted-foreground/60",
-                  "py-2 px-1 min-h-[24px] max-h-[200px]",
+                  "text-[15px] text-foreground placeholder:text-muted-foreground/50",
+                  "py-1.5 min-h-[24px] max-h-[200px]",
                   "leading-relaxed"
                 )}
               />
             </div>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-              {/* Think indicator */}
+            <div className="flex items-center gap-2 flex-shrink-0 self-end pb-1">
+              {/* Think indicator - shows when thinking is enabled */}
               {activeButtons.thinkLevel !== "off" && (
-                <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-primary/20 bg-primary/5 text-primary text-xs font-medium">
                   <Sparkles className="w-3 h-3" />
                   <span className="capitalize">{activeButtons.thinkLevel}</span>
                 </div>
@@ -389,16 +391,16 @@ export function Composer({
                 disabled={isStreaming}
                 className={cn(
                   "flex items-center justify-center",
-                  "w-10 h-10 sm:w-9 sm:h-9 rounded-full",
-                  "transition-all duration-150",
+                  "w-9 h-9 rounded-full border",
+                  "transition-all duration-200",
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                   isRecording 
-                    ? "bg-red-500 text-white animate-pulse" 
-                    : "bg-muted/50 hover:bg-muted active:bg-muted/75"
+                    ? "bg-destructive/10 border-destructive/30 text-destructive" 
+                    : "border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground"
                 )}
                 aria-label={isRecording ? "Stop recording" : "Voice to text"}
               >
-                <Mic className="w-4 h-4" />
+                <Mic className={cn("w-4 h-4", isRecording && "animate-pulse")} />
               </button>
 
               {/* Voice Mode / Send Button */}
@@ -408,10 +410,10 @@ export function Composer({
                   disabled={isStreaming}
                   className={cn(
                     "flex items-center justify-center",
-                    "w-10 h-10 sm:w-9 sm:h-9 rounded-full",
+                    "w-9 h-9 rounded-full",
                     "bg-primary text-primary-foreground",
                     "hover:bg-primary/90 active:scale-95",
-                    "transition-all duration-150",
+                    "transition-all duration-200",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                   aria-label="Send message"
@@ -425,10 +427,10 @@ export function Composer({
                   disabled={isStreaming}
                   className={cn(
                     "flex items-center justify-center",
-                    "w-10 h-10 sm:w-9 sm:h-9 rounded-full",
+                    "w-9 h-9 rounded-full",
                     "bg-primary text-primary-foreground",
                     "hover:bg-primary/90 active:scale-95",
-                    "transition-all duration-150",
+                    "transition-all duration-200",
                     "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                   aria-label="Open voice mode"
