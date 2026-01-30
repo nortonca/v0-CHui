@@ -7,6 +7,13 @@ import { getAIResponse } from "./utils"
 import ChatHeader from "./chat-header"
 import MessageSectionComponent from "./message-section"
 import InputArea from "./input-area"
+import OnboardingModal, { type OnboardingData } from "@/components/onboarding/onboarding-modal"
+import ActivitySidebar from "./activity-sidebar"
+import type { ActivityItem } from "./activity-feed"
+import type { Memory } from "./memory-panel"
+import type { Checkpoint } from "./checkpoints-panel"
+import type { Playbook } from "./playbooks-panel"
+import type { CollaborationMode } from "./collaboration-mode"
 
 export default function ChatInterface() {
   const [inputValue, setInputValue] = useState("")
@@ -34,6 +41,141 @@ export default function ChatInterface() {
   const mainContainerRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([])
+
+  // New feature states
+  const [showOnboarding, setShowOnboarding] = useState(true)
+  const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null)
+  const [isActivitySidebarOpen, setIsActivitySidebarOpen] = useState(false)
+  const [collaborationMode, setCollaborationMode] = useState<CollaborationMode>("collaborate")
+  
+  // Activity feed state
+  const [activities, setActivities] = useState<ActivityItem[]>([])
+  
+  // Memory state (lifted up from InputArea for persistence)
+  const [memories, setMemories] = useState<Memory[]>([])
+  
+  // Checkpoints state
+  const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([])
+  const [currentCheckpointId, setCurrentCheckpointId] = useState<string | undefined>()
+  
+  // Playbooks state
+  const [playbooks, setPlaybooks] = useState<Playbook[]>([])
+  
+  // Scheduled tasks state
+  const [scheduledTasks, setScheduledTasks] = useState<{
+    id: string
+    name: string
+    schedule: string
+    nextRun: Date
+    enabled: boolean
+  }[]>([])
+
+  // Handle onboarding completion
+  const handleOnboardingComplete = (data: OnboardingData) => {
+    setOnboardingData(data)
+    setShowOnboarding(false)
+    setCollaborationMode(data.collaborationMode)
+    
+    // Add initial memories from onboarding
+    const newMemories: Memory[] = []
+    
+    if (data.userRole) {
+      newMemories.push({
+        id: `memory-${Date.now()}-1`,
+        category: "fact",
+        text: `Works as: ${data.userRole}`,
+        createdAt: new Date(),
+        source: "user",
+      })
+    }
+    
+    if (data.primaryUse) {
+      newMemories.push({
+        id: `memory-${Date.now()}-2`,
+        category: "workflow",
+        text: `Primary use: ${data.primaryUse}`,
+        createdAt: new Date(),
+        source: "user",
+      })
+    }
+    
+    newMemories.push({
+      id: `memory-${Date.now()}-3`,
+      category: "preference",
+      text: `Collaboration mode: ${data.collaborationMode}`,
+      createdAt: new Date(),
+      source: "user",
+    })
+    
+    setMemories(newMemories)
+    
+    // Add welcome activity
+    setActivities([{
+      id: `activity-${Date.now()}`,
+      type: "completed",
+      title: "Onboarding completed",
+      description: `Welcome! I'm ${data.assistantName}, ready to help.`,
+      timestamp: new Date(),
+      status: "completed",
+    }])
+    
+    // Create initial checkpoint
+    const initialCheckpoint: Checkpoint = {
+      id: `checkpoint-${Date.now()}`,
+      title: "Session Started",
+      description: "Fresh conversation began",
+      timestamp: new Date(),
+      messageCount: 0,
+      type: "auto",
+    }
+    setCheckpoints([initialCheckpoint])
+    setCurrentCheckpointId(initialCheckpoint.id)
+  }
+
+  // Add activity helper
+  const addActivity = (activity: Omit<ActivityItem, "id" | "timestamp">) => {
+    setActivities(prev => [{
+      ...activity,
+      id: `activity-${Date.now()}`,
+      timestamp: new Date(),
+    }, ...prev].slice(0, 50)) // Keep last 50 activities
+  }
+
+  // Create checkpoint helper
+  const createCheckpoint = (title?: string, description?: string) => {
+    const checkpoint: Checkpoint = {
+      id: `checkpoint-${Date.now()}`,
+      title: title || `Checkpoint ${checkpoints.length + 1}`,
+      description: description || `Saved at ${messages.length} messages`,
+      timestamp: new Date(),
+      messageCount: messages.length,
+      type: title ? "manual" : "auto",
+    }
+    setCheckpoints(prev => [checkpoint, ...prev])
+    setCurrentCheckpointId(checkpoint.id)
+    
+    addActivity({
+      type: "completed",
+      title: "Checkpoint created",
+      description: checkpoint.title,
+      status: "completed",
+    })
+  }
+
+  // Restore checkpoint
+  const restoreCheckpoint = (checkpointId: string) => {
+    const checkpoint = checkpoints.find(c => c.id === checkpointId)
+    if (checkpoint) {
+      // In a real app, this would restore the actual message state
+      setCurrentCheckpointId(checkpointId)
+      addActivity({
+        type: "completed",
+        title: "Checkpoint restored",
+        description: checkpoint.title,
+        status: "completed",
+      })
+    }
+  }
 
   // Check if device is mobile and get viewport height
   useEffect(() => {
@@ -118,6 +260,13 @@ export default function ChatInterface() {
 
     setMessageSections(sections)
   }, [messages])
+
+  // Auto-create checkpoint every 5 messages
+  useEffect(() => {
+    if (messages.length > 0 && messages.length % 5 === 0) {
+      createCheckpoint(`Auto-save`, `After ${messages.length} messages`)
+    }
+  }, [messages.length])
 
   // Scroll to maximum position when new section is created, but only for sections after the first
   useEffect(() => {
@@ -210,6 +359,15 @@ export default function ChatInterface() {
       },
     ]
 
+    // Add activity for response generation
+    addActivity({
+      type: "task",
+      title: "Generating response",
+      description: `Processing: "${userMessage.substring(0, 30)}..."`,
+      status: "running",
+      progress: 0,
+    })
+
     // Create a new message with thinking and tool calls
     const messageId = Date.now().toString()
     setStreamingMessageId(messageId)
@@ -266,6 +424,14 @@ export default function ChatInterface() {
     // Add to completed messages set to prevent re-animation
     setCompletedMessages((prev) => new Set(prev).add(messageId))
 
+    // Update activity
+    addActivity({
+      type: "completed",
+      title: "Response completed",
+      description: `Replied to: "${userMessage.substring(0, 30)}..."`,
+      status: "completed",
+    })
+
     // Add vibration when streaming ends
     navigator.vibrate(50)
 
@@ -298,10 +464,11 @@ export default function ChatInterface() {
       setInputValue("")
       setActiveButtons({
         add: false,
-        deepSearch: false,
-        think: false,
+        tools: false,
+        thinkLevel: "off",
         image: false,
         browser: false,
+        selectedTools: [],
       })
       setUploadedImages([])
 
@@ -318,13 +485,74 @@ export default function ChatInterface() {
     }
   }
 
+  // Playbook handlers
+  const handlePlaybookRun = (playbook: Playbook) => {
+    const prompt = `Let's run the "${playbook.name}" playbook. Steps:\n${playbook.steps.map((s, i) => `${i + 1}. ${s}`).join("\n")}`
+    setInputValue(prompt)
+    
+    addActivity({
+      type: "task",
+      title: `Running playbook: ${playbook.name}`,
+      description: playbook.description,
+      status: "running",
+    })
+  }
+
+  const handlePlaybookAdd = (playbook: Omit<Playbook, "id">) => {
+    const newPlaybook: Playbook = {
+      ...playbook,
+      id: `playbook-${Date.now()}`,
+    }
+    setPlaybooks(prev => [...prev, newPlaybook])
+  }
+
+  const handlePlaybookDelete = (id: string) => {
+    setPlaybooks(prev => prev.filter(p => p.id !== id))
+  }
+
+  // Memory handlers
+  const handleMemoryEdit = (id: string, text: string) => {
+    setMemories(prev => prev.map(m => m.id === id ? { ...m, text } : m))
+  }
+
+  const handleMemoryDelete = (id: string) => {
+    setMemories(prev => prev.filter(m => m.id !== id))
+  }
+
   return (
     <div
       ref={mainContainerRef}
       className="bg-background flex flex-col overflow-hidden"
       style={{ height: isMobile ? `${viewportHeight}px` : "100svh" }}
     >
-      <ChatHeader />
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboarding}
+        onComplete={handleOnboardingComplete}
+      />
+
+      {/* Activity Sidebar */}
+      <ActivitySidebar
+        isOpen={isActivitySidebarOpen}
+        onClose={() => setIsActivitySidebarOpen(false)}
+        activities={activities}
+        scheduledTasks={scheduledTasks}
+        onActivityClick={(id) => {
+          // Handle activity click (e.g., for errors that need attention)
+          console.log("Activity clicked:", id)
+        }}
+        onToggleScheduledTask={(id) => {
+          setScheduledTasks(prev => 
+            prev.map(t => t.id === id ? { ...t, enabled: !t.enabled } : t)
+          )
+        }}
+      />
+
+      <ChatHeader 
+        onActivityClick={() => setIsActivitySidebarOpen(true)}
+        assistantName={onboardingData?.assistantName}
+        activityCount={activities.filter(a => a.status === "running").length}
+      />
 
       <div ref={chatContainerRef} className="flex-grow pb-32 pt-12 px-4 overflow-y-auto">
         <div className="max-w-3xl mx-auto space-y-4">
@@ -355,6 +583,20 @@ export default function ChatInterface() {
         textareaRef={textareaRef}
         uploadedImages={uploadedImages}
         setUploadedImages={setUploadedImages}
+        // New props for features
+        memories={memories}
+        onMemoryEdit={handleMemoryEdit}
+        onMemoryDelete={handleMemoryDelete}
+        checkpoints={checkpoints}
+        currentCheckpointId={currentCheckpointId}
+        onCheckpointRestore={restoreCheckpoint}
+        onCheckpointCreate={() => createCheckpoint("Manual save", "User-created checkpoint")}
+        playbooks={playbooks}
+        onPlaybookRun={handlePlaybookRun}
+        onPlaybookAdd={handlePlaybookAdd}
+        onPlaybookDelete={handlePlaybookDelete}
+        collaborationMode={collaborationMode}
+        onCollaborationModeChange={setCollaborationMode}
       />
     </div>
   )
