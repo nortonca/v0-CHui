@@ -25,10 +25,7 @@ export default function VoiceToggleButton({ isStreaming, onClick }: VoiceToggleB
       disabled={isStreaming}
       aria-label="Open voice mode"
     >
-      <AudioWaveform className={cn(
-        "h-5 w-5 transition-transform duration-200",
-        "group-hover:scale-110"
-      )} />
+      <AudioWaveform className="h-5 w-5" />
       
       {/* Subtle glow effect */}
       <span className={cn(
