@@ -85,3 +85,52 @@ textarea::-webkit-scrollbar-thumb:hover {
 .bg-gradient-radial {
   background-image: radial-gradient(circle, var(--tw-gradient-stops));
 }
+
+/* Primary color utilities - standardized orange accent system */
+.glow-primary {
+  box-shadow: 0 0 20px var(--primary-light), 0 0 40px var(--primary-lighter);
+}
+
+.glow-primary-sm {
+  box-shadow: 0 0 10px var(--primary-light);
+}
+
+.border-primary-light {
+  border-color: var(--primary-light);
+}
+
+.bg-primary-gradient {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+}
+
+/* Focus ring with primary orange color */
+.focus-ring-primary {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Pulse animation with primary color */
+@keyframes pulse-primary {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-primary {
+  animation: pulse-primary 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Ping animation with primary color */
+@keyframes ping-primary {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-ping-primary {
+  animation: ping-primary 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
