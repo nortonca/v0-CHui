@@ -44,7 +44,7 @@ interface ComposerProps {
   onCollaborationModeChange: (mode: CollaborationMode) => void
 }
 
-export default function Composer({
+export function Composer({
   inputValue,
   setInputValue,
   handleSubmit,
@@ -72,15 +72,12 @@ export default function Composer({
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [activePanel, setActivePanel] = useState<string | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
-  const [hasTyped, setHasTyped] = useState(false) // Declare hasTyped variable
+  const [isRecording, setIsRecording] = useState(false)
+  const [hasTyped, setHasTyped] = useState(false)
+  const [hasContent, setHasContent] = useState(false); // Declare hasContent variable
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const handleVoiceModeClick = () => {
-    // Implement voice mode click handler
-    console.log("Voice mode clicked")
-  }
-
-  // Count active features for badge
+  // Derived states
   const activeFeatureCount = [
     activeButtons.thinkLevel !== "off",
     activeButtons.selectedTools.length > 0,
@@ -95,6 +92,7 @@ export default function Composer({
       const newHeight = Math.max(24, Math.min(textarea.scrollHeight, 200))
       textarea.style.height = `${newHeight}px`
     }
+    setHasContent(inputValue.trim().length > 0); // Update hasContent state
   }, [inputValue, textareaRef])
 
   // Close tray when clicking outside
@@ -121,10 +119,6 @@ export default function Composer({
     if (!isMobile && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       handleSubmit(e)
-    }
-
-    if (e.key !== "Enter") {
-      setHasTyped(true)
     }
   }
 
@@ -173,6 +167,11 @@ export default function Composer({
     })
   }
 
+  const handleMicrophoneClick = () => {
+    console.log("Microphone button clicked");
+    // Implement microphone functionality here
+  }
+
   // Task handlers
   const handleTaskToggle = (id: string) => {
     setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t))
@@ -186,8 +185,6 @@ export default function Composer({
   const handleTaskDelete = (id: string) => {
     setTasks(prev => prev.filter(t => t.id !== id))
   }
-
-  const hasContent = inputValue.trim() !== "" || uploadedImages.length > 0
 
   return (
     <div 
@@ -293,7 +290,10 @@ export default function Composer({
               <textarea
                 ref={textareaRef}
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                  setHasContent(e.target.value.trim().length > 0); // Update hasContent state on change
+                }}
                 onKeyDown={handleKeyDown}
                 placeholder="Message..."
                 disabled={isStreaming}
@@ -320,21 +320,24 @@ export default function Composer({
               {/* Microphone Button - Speech-to-text */}
               <button
                 type="button"
+                onClick={handleMicrophoneClick}
                 disabled={isStreaming}
                 className={cn(
                   "flex items-center justify-center",
                   "w-10 h-10 sm:w-9 sm:h-9 rounded-full",
-                  "bg-muted/50 hover:bg-muted active:bg-muted/75",
                   "transition-all duration-150",
-                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                  "disabled:opacity-50 disabled:cursor-not-allowed",
+                  isRecording 
+                    ? "bg-red-500 text-white animate-pulse" 
+                    : "bg-muted/50 hover:bg-muted active:bg-muted/75"
                 )}
-                aria-label="Voice to text"
+                aria-label={isRecording ? "Stop recording" : "Voice to text"}
               >
-                <Mic className="w-4 h-4 text-muted-foreground" />
+                <Mic className="w-4 h-4" />
               </button>
 
               {/* Voice Mode / Send Button */}
-              {hasTyped || uploadedImages.length > 0 ? (
+              {hasContent ? (
                 <button
                   type="submit"
                   disabled={isStreaming}
@@ -353,7 +356,7 @@ export default function Composer({
               ) : (
                 <button
                   type="button"
-                  onClick={handleVoiceModeClick}
+                  onClick={() => console.log("[v0] Voice mode clicked - opening voice modal")}
                   disabled={isStreaming}
                   className={cn(
                     "flex items-center justify-center",
