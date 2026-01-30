@@ -277,7 +277,7 @@ export default function ChatInterface() {
   return (
     <div
       ref={mainContainerRef}
-      className="bg-gray-50 flex flex-col overflow-hidden"
+      className="bg-background flex flex-col overflow-hidden"
       style={{ height: isMobile ? `${viewportHeight}px` : "100svh" }}
     >
       <ChatHeader />

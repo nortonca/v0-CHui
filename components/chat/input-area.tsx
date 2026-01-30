@@ -172,7 +172,7 @@ export default function InputArea({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 p-4 bg-gray-50">
+    <div className="fixed bottom-0 left-0 right-0 p-4 bg-background">
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
         {/* Image upload area */}
         <ImageUpload
@@ -185,7 +185,7 @@ export default function InputArea({
         <div
           ref={inputContainerRef}
           className={cn(
-            "relative w-full rounded-3xl border border-gray-200 bg-white p-3 cursor-text",
+            "relative w-full rounded-3xl border border-border bg-card p-3 cursor-text",
             isStreaming && "opacity-80",
           )}
           onClick={handleInputContainerClick}

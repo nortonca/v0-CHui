@@ -50,7 +50,7 @@ export default function MessageComponent({
               <img
                 src={image.url || "/placeholder.svg"}
                 alt="Uploaded"
-                className="max-w-[150px] max-h-[150px] object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition-opacity"
+                className="max-w-[150px] max-h-[150px] object-cover rounded-lg border border-border cursor-pointer hover:opacity-90 transition-opacity"
               />
             </div>
           ))}
@@ -60,7 +60,7 @@ export default function MessageComponent({
       <div
         className={cn(
           "max-w-[80%] px-4 py-2 rounded-2xl",
-          message.type === "user" ? "bg-white border border-gray-200 rounded-br-none" : "text-gray-900",
+          message.type === "user" ? "bg-card border border-border rounded-br-none" : "text-foreground",
         )}
       >
         {/* For user messages or completed system messages, render without animation */}
@@ -83,19 +83,19 @@ export default function MessageComponent({
       {/* Message actions */}
       {message.type === "system" && message.completed && (
         <div className="flex items-center gap-2 px-4 mt-1 mb-2">
-          <button className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button className="text-muted-foreground hover:text-foreground transition-colors">
             <RefreshCcw className="h-4 w-4" />
           </button>
-          <button className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button className="text-muted-foreground hover:text-foreground transition-colors">
             <Copy className="h-4 w-4" />
           </button>
-          <button className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button className="text-muted-foreground hover:text-foreground transition-colors">
             <Share2 className="h-4 w-4" />
           </button>
-          <button className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button className="text-muted-foreground hover:text-foreground transition-colors">
             <ThumbsUp className="h-4 w-4" />
           </button>
-          <button className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button className="text-muted-foreground hover:text-foreground transition-colors">
             <ThumbsDown className="h-4 w-4" />
           </button>
         </div>
