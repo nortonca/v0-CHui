@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { cn } from "@/lib/utils"
-import { Send, Plus, Mic, Sparkles, AudioWaveform } from "lucide-react"
+import { Send, Plus, X, Mic, Sparkles, AudioWaveform } from "lucide-react"
 import type { ActiveButtonState, UploadedImage } from "../types"
 import type { Memory } from "../memory-panel"
 import type { Checkpoint } from "../checkpoints-panel"
@@ -72,8 +72,13 @@ export default function Composer({
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [activePanel, setActivePanel] = useState<string | null>(null)
   const [tasks, setTasks] = useState<Task[]>([])
-  const [isRecording, setIsRecording] = useState(false)
+  const [hasTyped, setHasTyped] = useState(false) // Declare hasTyped variable
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const handleVoiceModeClick = () => {
+    // Implement voice mode click handler
+    console.log("Voice mode clicked")
+  }
 
   // Count active features for badge
   const activeFeatureCount = [
@@ -116,6 +121,10 @@ export default function Composer({
     if (!isMobile && e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       handleSubmit(e)
+    }
+
+    if (e.key !== "Enter") {
+      setHasTyped(true)
     }
   }
 
@@ -179,26 +188,6 @@ export default function Composer({
   }
 
   const hasContent = inputValue.trim() !== "" || uploadedImages.length > 0
-
-  // Microphone handler
-  const handleMicrophoneClick = () => {
-    if (isRecording) {
-      setIsRecording(false)
-    } else {
-      setIsRecording(true)
-      // Simulate recording - in production this would use Web Speech API
-      setTimeout(() => {
-        setIsRecording(false)
-        setInputValue(inputValue + (inputValue ? " " : "") + "This is simulated voice input.")
-      }, 3000)
-    }
-  }
-
-  // Voice mode handler
-  const handleVoiceModeClick = () => {
-    // Open voice agent mode - this would trigger a modal or view change
-    console.log("Voice mode activated")
-  }
 
   return (
     <div 
@@ -320,7 +309,7 @@ export default function Composer({
 
             {/* Right Actions */}
             <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-              {/* Think indicator - desktop only */}
+              {/* Think indicator */}
               {activeButtons.thinkLevel !== "off" && (
                 <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
                   <Sparkles className="w-3 h-3" />
@@ -328,30 +317,24 @@ export default function Composer({
                 </div>
               )}
 
-              {/* Microphone Button - Always visible */}
+              {/* Microphone Button - Speech-to-text */}
               <button
                 type="button"
-                onClick={handleMicrophoneClick}
                 disabled={isStreaming}
                 className={cn(
                   "flex items-center justify-center",
                   "w-10 h-10 sm:w-9 sm:h-9 rounded-full",
-                  "border border-border",
-                  "hover:bg-muted/50 active:bg-muted/75",
+                  "bg-muted/50 hover:bg-muted active:bg-muted/75",
                   "transition-all duration-150",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                  isRecording && "bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-800"
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
                 )}
-                aria-label={isRecording ? "Stop recording" : "Start voice input"}
+                aria-label="Voice to text"
               >
-                <Mic className={cn(
-                  "w-4 h-4",
-                  isRecording ? "text-red-500" : "text-muted-foreground"
-                )} />
+                <Mic className="w-4 h-4 text-muted-foreground" />
               </button>
 
               {/* Voice Mode / Send Button */}
-              {hasContent ? (
+              {hasTyped || uploadedImages.length > 0 ? (
                 <button
                   type="submit"
                   disabled={isStreaming}
