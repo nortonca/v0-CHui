@@ -225,15 +225,15 @@ export default function InputArea({
                   toggleButton={() => toggleButton("think")}
                   isStreaming={isStreaming}
                 />
+              </div>
 
+              <div className="flex items-center space-x-2">
                 <MicrophoneButton 
                   isStreaming={isStreaming} 
                   setInputValue={setInputValue} 
                   setHasTyped={setHasTyped} 
                 />
-              </div>
-
-              <div className="flex items-center space-x-2">
+                
                 {!hasTyped && uploadedImages.length === 0 ? (
                   <VoiceToggleButton
                     isStreaming={isStreaming}
