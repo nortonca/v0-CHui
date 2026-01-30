@@ -8,12 +8,12 @@ import ChatHeader from "./chat-header"
 import MessageSectionComponent from "./message-section"
 import InputArea from "./input-area"
 import OnboardingModal, { type OnboardingData } from "@/components/onboarding/onboarding-modal"
-import ActivitySidebar from "./activity-sidebar"
-import type { ActivityItem } from "./activity-feed"
+import ActivityModalContent, { type ActivityItem, type ScheduledTask } from "./activity-modal-content"
 import type { Memory } from "./memory-panel"
 import type { Checkpoint } from "./checkpoints-panel"
 import type { Playbook } from "./playbooks-panel"
 import type { CollaborationMode } from "./collaboration-mode"
+import { useModal } from "@/components/providers/modal-provider"
 
 export default function ChatInterface() {
   const [inputValue, setInputValue] = useState("")
@@ -41,12 +41,13 @@ export default function ChatInterface() {
   const mainContainerRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([])
+  const [isActivitySidebarOpen, setIsActivitySidebarOpen] = useState(false) // Declared the variable here
 
   // New feature states
   const [showOnboarding, setShowOnboarding] = useState(true)
   const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null)
-  const [isActivitySidebarOpen, setIsActivitySidebarOpen] = useState(false)
   const [collaborationMode, setCollaborationMode] = useState<CollaborationMode>("collaborate")
+  const { openModal, closeModal } = useModal()
   
   // Activity feed state
   const [activities, setActivities] = useState<ActivityItem[]>([])
@@ -62,13 +63,20 @@ export default function ChatInterface() {
   const [playbooks, setPlaybooks] = useState<Playbook[]>([])
   
   // Scheduled tasks state
-  const [scheduledTasks, setScheduledTasks] = useState<{
-    id: string
-    name: string
-    schedule: string
-    nextRun: Date
-    enabled: boolean
-  }[]>([])
+  const [scheduledTasks, setScheduledTasks] = useState<ScheduledTask[]>([])
+
+  // Handle activity modal
+  const handleOpenActivity = () => {
+    openModal(
+      "activity",
+      <ActivityModalContent
+        onClose={() => closeModal("activity")}
+        activities={activities}
+        scheduledTasks={scheduledTasks}
+      />,
+      () => {}
+    )
+  }
 
   // Handle onboarding completion
   const handleOnboardingComplete = (data: OnboardingData) => {
@@ -531,27 +539,10 @@ export default function ChatInterface() {
         onComplete={handleOnboardingComplete}
       />
 
-      {/* Activity Sidebar */}
-      <ActivitySidebar
-        isOpen={isActivitySidebarOpen}
-        onClose={() => setIsActivitySidebarOpen(false)}
-        activities={activities}
-        scheduledTasks={scheduledTasks}
-        onActivityClick={(id) => {
-          // Handle activity click (e.g., for errors that need attention)
-          console.log("Activity clicked:", id)
-        }}
-        onToggleScheduledTask={(id) => {
-          setScheduledTasks(prev => 
-            prev.map(t => t.id === id ? { ...t, enabled: !t.enabled } : t)
-          )
-        }}
-      />
-
       <ChatHeader 
-        onActivityClick={() => setIsActivitySidebarOpen(true)}
+        onActivityClick={handleOpenActivity}
         assistantName={onboardingData?.assistantName}
-        activityCount={activities.filter(a => a.status === "running").length}
+        activityCount={activities.filter(a => a.type === "thinking" || a.type === "searching" || a.type === "writing").length}
       />
 
       <div ref={chatContainerRef} className="flex-grow pb-32 pt-12 px-4 overflow-y-auto">
