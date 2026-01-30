@@ -14,25 +14,16 @@ export default function VoiceToggleButton({ isStreaming, onClick }: VoiceToggleB
       type="button"
       className={cn(
         "relative flex items-center justify-center",
-        "rounded-full h-10 w-10 flex-shrink-0",
+        "rounded-full h-8 w-8 flex-shrink-0",
         "bg-primary text-white",
         "hover:bg-primary/90 transition-all duration-200",
         "disabled:opacity-50 disabled:cursor-not-allowed",
-        "shadow-sm hover:shadow-md",
-        "group"
       )}
       onClick={onClick}
       disabled={isStreaming}
       aria-label="Open voice mode"
     >
-      <AudioWaveform className="h-5 w-5" />
-      
-      {/* Subtle glow effect */}
-      <span className={cn(
-        "absolute inset-0 rounded-full bg-primary opacity-0",
-        "group-hover:opacity-50 transition-opacity duration-200",
-        "blur-md -z-10"
-      )} />
+      <AudioWaveform className="h-4 w-4" />
     </button>
   )
 }
