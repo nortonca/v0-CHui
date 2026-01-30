@@ -1,6 +1,6 @@
 "use client"
 
-import { X, Brain, Zap, MessageSquare, Trash2, Sparkles } from "lucide-react"
+import { X, Brain, ListChecks, Sparkles, Trash2, ShieldQuestion, Zap, MessageSquare } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
 
@@ -8,33 +8,87 @@ interface SettingsModalContentProps {
   onClose: () => void
 }
 
+const AGENT_MODES = [
+  { 
+    id: "normal", 
+    label: "Normal", 
+    description: "Executes tasks directly with reasonable assumptions" 
+  },
+  { 
+    id: "plan", 
+    label: "Plan", 
+    description: "Shows a step-by-step plan before executing" 
+  },
+  { 
+    id: "ask", 
+    label: "Ask", 
+    description: "Asks clarifying questions before taking action" 
+  },
+]
+
+const PLANNING_MODES = [
+  { 
+    id: "auto", 
+    label: "Auto", 
+    description: "Creates task lists for complex requests only" 
+  },
+  { 
+    id: "always", 
+    label: "Always", 
+    description: "Shows task breakdown for every request" 
+  },
+  { 
+    id: "never", 
+    label: "Never", 
+    description: "Never show task lists, execute directly" 
+  },
+]
+
 const WORKING_STYLES = [
-  { id: "direct", label: "Direct", description: "Straight to the point" },
-  { id: "analytical", label: "Analytical", description: "Detailed breakdowns" },
-  { id: "creative", label: "Creative", description: "Exploratory and imaginative" },
-  { id: "fast", label: "Fast", description: "Quick responses, less detail" },
+  { 
+    id: "style1", 
+    label: "Style 1", 
+    description: "Description for Style 1" 
+  },
+  { 
+    id: "style2", 
+    label: "Style 2", 
+    description: "Description for Style 2" 
+  },
+  { 
+    id: "style3", 
+    label: "Style 3", 
+    description: "Description for Style 3" 
+  },
 ]
 
 const DECISION_STYLES = [
-  { id: "ask", label: "Ask First", description: "Confirm before taking actions" },
-  { id: "balanced", label: "Balanced", description: "Ask for major decisions only" },
-  { id: "autonomous", label: "Autonomous", description: "Make reasonable assumptions" },
-]
-
-const PERSONALITY_PRESETS = [
-  { id: "preset1", name: "Preset 1", description: "Description for Preset 1" },
-  { id: "preset2", name: "Preset 2", description: "Description for Preset 2" },
-  { id: "preset3", name: "Preset 3", description: "Description for Preset 3" },
+  { 
+    id: "styleA", 
+    label: "Style A", 
+    description: "Description for Style A" 
+  },
+  { 
+    id: "styleB", 
+    label: "Style B", 
+    description: "Description for Style B" 
+  },
+  { 
+    id: "styleC", 
+    label: "Style C", 
+    description: "Description for Style C" 
+  },
 ]
 
 export default function SettingsModalContent({ onClose }: SettingsModalContentProps) {
-  const [workingStyle, setWorkingStyle] = useState("analytical")
-  const [detailLevel, setDetailLevel] = useState(50)
-  const [decisionStyle, setDecisionStyle] = useState("balanced")
-  const [challengeDecisions, setChallengeDecisions] = useState(false)
+  const [agentMode, setAgentMode] = useState("normal")
+  const [planningMode, setPlanningMode] = useState("auto")
+  const [autoApply, setAutoApply] = useState(true)
   const [memoryEnabled, setMemoryEnabled] = useState(true)
-  const [selectedPersonality, setSelectedPersonality] = useState("preset1")
-  const [customInstructions, setCustomInstructions] = useState("")
+  const [workingStyle, setWorkingStyle] = useState("style1")
+  const [detailLevel, setDetailLevel] = useState(50)
+  const [decisionStyle, setDecisionStyle] = useState("styleA")
+  const [challengeDecisions, setChallengeDecisions] = useState(false)
 
   return (
     <div className="flex items-center justify-center h-full p-4">
@@ -63,134 +117,118 @@ export default function SettingsModalContent({ onClose }: SettingsModalContentPr
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
-          {/* Working Style Section */}
+          {/* Agent Mode Section */}
           <section>
-            <div className="flex items-center gap-2 mb-4">
-              <Zap className="size-5 text-primary" />
-              <h3 className="text-base font-semibold text-foreground">Working Style</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="size-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Agent Mode</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              How the assistant thinks and approaches tasks.
+              How the agent behaves before taking action.
             </p>
 
             <div className="space-y-2">
-              {WORKING_STYLES.map((style) => (
+              {AGENT_MODES.map((mode) => (
                 <button
-                  key={style.id}
-                  onClick={() => setWorkingStyle(style.id)}
+                  key={mode.id}
+                  onClick={() => setAgentMode(mode.id)}
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left",
                     "hover:bg-muted/50",
-                    workingStyle === style.id && "bg-primary/5 border border-primary/20"
+                    agentMode === mode.id && "bg-primary/5 border border-primary/20"
                   )}
                 >
                   <div className="flex-shrink-0">
                     <div className={cn(
                       "w-4 h-4 rounded-full border-2 transition-colors",
-                      workingStyle === style.id
+                      agentMode === mode.id
                         ? "border-primary bg-primary"
                         : "border-muted-foreground"
                     )}>
-                      {workingStyle === style.id && (
+                      {agentMode === mode.id && (
                         <div className="w-full h-full rounded-full bg-white scale-50" />
                       )}
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-foreground">{style.label}</div>
-                    <div className="text-xs text-muted-foreground">{style.description}</div>
+                    <div className="text-sm font-medium text-foreground">{mode.label}</div>
+                    <div className="text-xs text-muted-foreground">{mode.description}</div>
                   </div>
                 </button>
               ))}
             </div>
           </section>
 
-          {/* Output Detail Level */}
+          {/* Task Planning Section */}
           <section>
-            <div className="flex items-center gap-2 mb-4">
-              <MessageSquare className="size-5 text-primary" />
-              <h3 className="text-base font-semibold text-foreground">Response Detail</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <ListChecks className="size-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Task Planning</h3>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Control how thorough or brief responses should be.
+              When to show a breakdown of steps before execution.
             </p>
 
-            <div className="px-4 py-4 rounded-xl bg-muted/30">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-muted-foreground">Brief</span>
-                <span className="text-xs text-muted-foreground">Thorough</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={detailLevel}
-                onChange={(e) => setDetailLevel(Number(e.target.value))}
-                className="w-full h-2 bg-border rounded-full appearance-none cursor-pointer accent-primary"
-              />
-            </div>
-          </section>
-
-          {/* Decision Style */}
-          <section>
-            <div className="flex items-center gap-2 mb-4">
-              <Brain className="size-5 text-primary" />
-              <h3 className="text-base font-semibold text-foreground">Decision Style</h3>
-            </div>
-            <p className="text-sm text-muted-foreground mb-4">
-              How the assistant handles choices and actions.
-            </p>
-
-            <div className="space-y-2 mb-4">
-              {DECISION_STYLES.map((style) => (
+            <div className="space-y-2">
+              {PLANNING_MODES.map((mode) => (
                 <button
-                  key={style.id}
-                  onClick={() => setDecisionStyle(style.id)}
+                  key={mode.id}
+                  onClick={() => setPlanningMode(mode.id)}
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors text-left",
                     "hover:bg-muted/50",
-                    decisionStyle === style.id && "bg-primary/5 border border-primary/20"
+                    planningMode === mode.id && "bg-primary/5 border border-primary/20"
                   )}
                 >
                   <div className="flex-shrink-0">
                     <div className={cn(
                       "w-4 h-4 rounded-full border-2 transition-colors",
-                      decisionStyle === style.id
+                      planningMode === mode.id
                         ? "border-primary bg-primary"
                         : "border-muted-foreground"
                     )}>
-                      {decisionStyle === style.id && (
+                      {planningMode === mode.id && (
                         <div className="w-full h-full rounded-full bg-white scale-50" />
                       )}
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-foreground">{style.label}</div>
-                    <div className="text-xs text-muted-foreground">{style.description}</div>
+                    <div className="text-sm font-medium text-foreground">{mode.label}</div>
+                    <div className="text-xs text-muted-foreground">{mode.description}</div>
                   </div>
                 </button>
               ))}
             </div>
+          </section>
 
-            {/* Challenge decisions toggle */}
+          {/* Auto-Apply Section */}
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <ShieldQuestion className="size-5 text-primary" />
+              <h3 className="text-base font-semibold text-foreground">Confirmations</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Control when the agent asks for confirmation.
+            </p>
+
             <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-muted/30">
               <div className="flex-1">
-                <div className="text-sm font-medium text-foreground">Challenge Decisions</div>
+                <div className="text-sm font-medium text-foreground">Auto-apply changes</div>
                 <div className="text-xs text-muted-foreground mt-0.5">
-                  Suggest alternatives when appropriate
+                  Apply code changes without asking
                 </div>
               </div>
               <button
-                onClick={() => setChallengeDecisions(!challengeDecisions)}
+                onClick={() => setAutoApply(!autoApply)}
                 className={cn(
                   "relative w-11 h-6 rounded-full transition-colors",
-                  challengeDecisions ? "bg-primary" : "bg-muted"
+                  autoApply ? "bg-primary" : "bg-muted"
                 )}
-                aria-label="Toggle challenge decisions"
+                aria-label="Toggle auto-apply"
               >
                 <div className={cn(
                   "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform",
-                  challengeDecisions && "translate-x-5"
+                  autoApply && "translate-x-5"
                 )} />
               </button>
             </div>
