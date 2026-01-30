@@ -81,6 +81,7 @@ export default function MenuModal({ isOpen, onClose }: MenuModalProps) {
               description="Manage tool connections"
               onClick={() => {
                 setIsToolsOpen(true)
+                onClose()
               }}
               badge="2 active"
             />

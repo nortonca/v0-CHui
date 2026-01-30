@@ -134,7 +134,7 @@ export default function ToolsModal({ isOpen, onClose }: ToolsModalProps) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 animate-fadeIn"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] animate-fadeIn"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -143,7 +143,7 @@ export default function ToolsModal({ isOpen, onClose }: ToolsModalProps) {
       <div
         className={cn(
           "fixed top-16 left-4 right-4 md:left-auto md:right-auto md:top-20 md:left-1/2 md:-translate-x-1/2",
-          "bg-card border border-border rounded-2xl shadow-2xl z-50",
+          "bg-card border border-border rounded-2xl shadow-2xl z-[70]",
           "w-auto md:w-[480px] max-h-[calc(100vh-120px)] overflow-hidden",
           "animate-scaleIn flex flex-col"
         )}
