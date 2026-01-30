@@ -98,97 +98,120 @@ export default function ImagePreview({ images, onRemove }: ImagePreviewProps) {
         ))}
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Lightbox Modal - Matches app modal pattern */}
       {isLightboxOpen && currentImage && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
           role="dialog"
           aria-modal="true"
           aria-label="Image preview"
         >
-          {/* Backdrop */}
+          {/* Backdrop - matches voice mode modal */}
           <div 
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+            className="absolute inset-0 bg-background/95 backdrop-blur-md animate-fadeIn"
             onClick={() => setLightboxIndex(null)}
+            aria-hidden="true"
           />
           
-          {/* Image Container */}
-          <div className="relative z-10 max-w-[90vw] max-h-[85vh] animate-in zoom-in-95 fade-in duration-200">
-            <Image
-              src={currentImage.url || "/placeholder.svg"}
-              alt="Preview image"
-              width={1200}
-              height={800}
-              className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
-            />
-          </div>
-
-          {/* Close button */}
-          <button
-            type="button"
-            onClick={() => setLightboxIndex(null)}
+          {/* Modal Container - matches app modal pattern */}
+          <div 
             className={cn(
-              "absolute top-4 right-4 z-20",
-              "w-10 h-10 rounded-full",
-              "bg-card/90 border border-border shadow-lg backdrop-blur-sm",
-              "text-foreground hover:bg-card",
-              "flex items-center justify-center",
-              "transition-all duration-150"
+              "relative w-full max-w-4xl max-h-[90vh]",
+              "bg-card border border-border rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden",
+              "animate-scaleIn flex flex-col"
             )}
-            aria-label="Close preview"
           >
-            <X className="w-5 h-5" />
-          </button>
-
-          {/* Navigation arrows - only show if multiple images */}
-          {images.length > 1 && (
-            <>
-              {/* Previous */}
-              <button
-                type="button"
-                onClick={() => setLightboxIndex(Math.max(0, lightboxIndex - 1))}
-                disabled={lightboxIndex === 0}
-                className={cn(
-                  "absolute left-4 top-1/2 -translate-y-1/2 z-20",
-                  "w-10 h-10 rounded-full",
-                  "bg-card/90 border border-border shadow-lg backdrop-blur-sm",
-                  "text-foreground hover:bg-card",
-                  "flex items-center justify-center",
-                  "transition-all duration-150",
-                  "disabled:opacity-30 disabled:cursor-not-allowed"
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-border bg-card">
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg font-semibold text-foreground">
+                  Image Preview
+                </h2>
+                {images.length > 1 && (
+                  <span className="text-sm text-muted-foreground">
+                    {lightboxIndex + 1} of {images.length}
+                  </span>
                 )}
-                aria-label="Previous image"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-
-              {/* Next */}
-              <button
-                type="button"
-                onClick={() => setLightboxIndex(Math.min(images.length - 1, lightboxIndex + 1))}
-                disabled={lightboxIndex === images.length - 1}
-                className={cn(
-                  "absolute right-4 top-1/2 -translate-y-1/2 z-20",
-                  "w-10 h-10 rounded-full",
-                  "bg-card/90 border border-border shadow-lg backdrop-blur-sm",
-                  "text-foreground hover:bg-card",
-                  "flex items-center justify-center",
-                  "transition-all duration-150",
-                  "disabled:opacity-30 disabled:cursor-not-allowed"
-                )}
-                aria-label="Next image"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-
-              {/* Image counter */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 px-3 py-1.5 rounded-full bg-card/90 border border-border shadow-lg backdrop-blur-sm">
-                <span className="text-sm font-medium text-foreground">
-                  {lightboxIndex + 1} / {images.length}
-                </span>
               </div>
-            </>
-          )}
+              <button
+                type="button"
+                onClick={() => setLightboxIndex(null)}
+                className="p-2 -mr-2 hover:bg-muted rounded-xl transition-colors"
+                aria-label="Close preview"
+              >
+                <X className="size-5 text-muted-foreground" />
+              </button>
+            </div>
+
+            {/* Image Area */}
+            <div className="relative flex-1 min-h-0 flex items-center justify-center p-4 md:p-6 bg-muted/30">
+              <Image
+                src={currentImage.url || "/placeholder.svg"}
+                alt="Preview image"
+                width={1200}
+                height={800}
+                className="max-w-full max-h-[60vh] object-contain rounded-lg"
+              />
+
+              {/* Navigation arrows - inside the image area */}
+              {images.length > 1 && (
+                <>
+                  {/* Previous */}
+                  <button
+                    type="button"
+                    onClick={() => setLightboxIndex(Math.max(0, lightboxIndex - 1))}
+                    disabled={lightboxIndex === 0}
+                    className={cn(
+                      "absolute left-4 top-1/2 -translate-y-1/2",
+                      "w-10 h-10 rounded-full",
+                      "bg-card border border-border shadow-md",
+                      "text-foreground hover:bg-muted",
+                      "flex items-center justify-center",
+                      "transition-all duration-150",
+                      "disabled:opacity-30 disabled:cursor-not-allowed"
+                    )}
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {/* Next */}
+                  <button
+                    type="button"
+                    onClick={() => setLightboxIndex(Math.min(images.length - 1, lightboxIndex + 1))}
+                    disabled={lightboxIndex === images.length - 1}
+                    className={cn(
+                      "absolute right-4 top-1/2 -translate-y-1/2",
+                      "w-10 h-10 rounded-full",
+                      "bg-card border border-border shadow-md",
+                      "text-foreground hover:bg-muted",
+                      "flex items-center justify-center",
+                      "transition-all duration-150",
+                      "disabled:opacity-30 disabled:cursor-not-allowed"
+                    )}
+                    aria-label="Next image"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Footer with keyboard hints */}
+            <div className="hidden md:flex items-center justify-center gap-6 px-4 py-3 border-t border-border bg-card">
+              <span className="text-xs text-muted-foreground">
+                <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border text-[10px] font-mono mr-1">ESC</kbd>
+                to close
+              </span>
+              {images.length > 1 && (
+                <span className="text-xs text-muted-foreground">
+                  <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border text-[10px] font-mono mr-1">←</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border text-[10px] font-mono mr-1">→</kbd>
+                  to navigate
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </>
