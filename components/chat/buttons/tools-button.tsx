@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Wrench, Check } from "lucide-react"
+import { Wrench, Check, Search, Calculator, Code, Palette } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface ToolsButtonProps {
@@ -11,10 +11,10 @@ interface ToolsButtonProps {
 }
 
 const AVAILABLE_TOOLS = [
-  { id: "web-search", name: "Web Search", icon: "🔍" },
-  { id: "calculator", name: "Calculator", icon: "🧮" },
-  { id: "code-interpreter", name: "Code Interpreter", icon: "💻" },
-  { id: "image-gen", name: "Image Generation", icon: "🎨" },
+  { id: "web-search", name: "Web Search", Icon: Search },
+  { id: "calculator", name: "Calculator", Icon: Calculator },
+  { id: "code-interpreter", name: "Code Interpreter", Icon: Code },
+  { id: "image-gen", name: "Image Generation", Icon: Palette },
 ]
 
 export default function ToolsButton({ selectedTools, onToolsChange, isStreaming }: ToolsButtonProps) {
@@ -68,23 +68,26 @@ export default function ToolsButton({ selectedTools, onToolsChange, isStreaming 
             <div className="text-xs font-medium text-muted-foreground px-2 py-1.5">
               Select Tools
             </div>
-            {AVAILABLE_TOOLS.map((tool) => (
-              <button
-                key={tool.id}
-                type="button"
-                onClick={() => toggleTool(tool.id)}
-                className={cn(
-                  "w-full flex items-center gap-3 px-2 py-2 rounded-lg transition-colors hover:bg-muted/50",
-                  selectedTools.includes(tool.id) && "bg-primary/5"
-                )}
-              >
-                <span className="text-lg">{tool.icon}</span>
-                <span className="flex-1 text-left text-sm text-foreground">{tool.name}</span>
-                {selectedTools.includes(tool.id) && (
-                  <Check className="h-4 w-4 text-primary" />
-                )}
-              </button>
-            ))}
+            {AVAILABLE_TOOLS.map((tool) => {
+              const isSelected = selectedTools.includes(tool.id)
+              return (
+                <button
+                  key={tool.id}
+                  type="button"
+                  onClick={() => toggleTool(tool.id)}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-2 py-2 rounded-lg transition-colors hover:bg-muted/50",
+                    isSelected && "bg-primary/5"
+                  )}
+                >
+                  <tool.Icon className={cn("h-4 w-4 text-muted-foreground", isSelected && "text-primary")} />
+                  <span className="flex-1 text-left text-sm text-foreground">{tool.name}</span>
+                  {isSelected && (
+                    <Check className="h-4 w-4 text-primary" />
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
       )}
