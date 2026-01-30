@@ -13,6 +13,8 @@ import MemoryPanel from "../memory-panel"
 import TaskPanel from "../task-panel"
 import PlaybooksPanel from "../playbooks-panel"
 import CheckpointsPanel from "../checkpoints-panel"
+import ThinkPanel from "../think-panel"
+import ToolsPanel from "../tools-panel"
 import InputBar from "./input-bar"
 
 interface InputAreaSimplifiedProps {
@@ -75,23 +77,29 @@ export default function InputAreaSimplified({
   const [isMemoryPanelExpanded, setIsMemoryPanelExpanded] = useState(false)
   const [isPlaybooksPanelExpanded, setIsPlaybooksPanelExpanded] = useState(false)
   const [isCheckpointsPanelExpanded, setIsCheckpointsPanelExpanded] = useState(false)
+  const [isThinkPanelExpanded, setIsThinkPanelExpanded] = useState(false)
+  const [isToolsPanelExpanded, setIsToolsPanelExpanded] = useState(false)
   
   // Tasks state (local to input area)
   const [tasks, setTasks] = useState<Task[]>([])
 
   // Toggle panel with exclusive behavior
-  const togglePanel = (panel: "task" | "memory" | "playbooks" | "checkpoints") => {
+  const togglePanel = (panel: "task" | "memory" | "playbooks" | "checkpoints" | "think" | "tools") => {
     const isCurrentlyOpen = 
       (panel === "task" && isTaskPanelExpanded) ||
       (panel === "memory" && isMemoryPanelExpanded) ||
       (panel === "playbooks" && isPlaybooksPanelExpanded) ||
-      (panel === "checkpoints" && isCheckpointsPanelExpanded)
+      (panel === "checkpoints" && isCheckpointsPanelExpanded) ||
+      (panel === "think" && isThinkPanelExpanded) ||
+      (panel === "tools" && isToolsPanelExpanded)
 
     // Close all panels first
     setIsTaskPanelExpanded(false)
     setIsMemoryPanelExpanded(false)
     setIsPlaybooksPanelExpanded(false)
     setIsCheckpointsPanelExpanded(false)
+    setIsThinkPanelExpanded(false)
+    setIsToolsPanelExpanded(false)
 
     // If the panel was closed, open it
     if (!isCurrentlyOpen) {
@@ -107,6 +115,12 @@ export default function InputAreaSimplified({
           break
         case "checkpoints":
           setIsCheckpointsPanelExpanded(true)
+          break
+        case "think":
+          setIsThinkPanelExpanded(true)
+          break
+        case "tools":
+          setIsToolsPanelExpanded(true)
           break
       }
     }
@@ -152,6 +166,16 @@ export default function InputAreaSimplified({
       const newHeight = Math.max(24, Math.min(textareaRef.current.scrollHeight, 160))
       textareaRef.current.style.height = `${newHeight}px`
     }
+  }
+
+  // Think level handler
+  const handleThinkLevelChange = (level: "off" | "on" | "deep") => {
+    setActiveButtons({ ...activeButtons, thinkLevel: level })
+  }
+
+  // Tools handler
+  const handleToolsChange = (tools: string[]) => {
+    setActiveButtons({ ...activeButtons, selectedTools: tools })
   }
 
   return (
@@ -209,6 +233,24 @@ export default function InputAreaSimplified({
           isMobile={isMobile}
         />
 
+        {/* Think Panel */}
+        <ThinkPanel
+          isExpanded={isThinkPanelExpanded}
+          onToggle={() => togglePanel("think")}
+          thinkLevel={activeButtons.thinkLevel}
+          onLevelChange={handleThinkLevelChange}
+          isMobile={isMobile}
+        />
+
+        {/* Tools Panel */}
+        <ToolsPanel
+          isExpanded={isToolsPanelExpanded}
+          onToggle={() => togglePanel("tools")}
+          selectedTools={activeButtons.selectedTools}
+          onToolsChange={handleToolsChange}
+          isMobile={isMobile}
+        />
+
         {/* Input Bar */}
         <InputBar
           inputValue={inputValue}
@@ -225,6 +267,8 @@ export default function InputAreaSimplified({
           isTaskPanelExpanded={isTaskPanelExpanded}
           isPlaybooksPanelExpanded={isPlaybooksPanelExpanded}
           isCheckpointsPanelExpanded={isCheckpointsPanelExpanded}
+          isThinkPanelExpanded={isThinkPanelExpanded}
+          isToolsPanelExpanded={isToolsPanelExpanded}
           memoriesCount={memories.length}
           tasksCount={tasks.length}
           tasksCompletedCount={tasks.filter(t => t.completed).length}

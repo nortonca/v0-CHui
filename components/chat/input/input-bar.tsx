@@ -27,12 +27,14 @@ interface InputBarProps {
   isTaskPanelExpanded: boolean
   isPlaybooksPanelExpanded: boolean
   isCheckpointsPanelExpanded: boolean
+  isThinkPanelExpanded: boolean
+  isToolsPanelExpanded: boolean
   memoriesCount: number
   tasksCount: number
   tasksCompletedCount: number
   checkpointsCount: number
   collaborationMode: CollaborationMode
-  onTogglePanel: (panel: "memory" | "task" | "playbooks" | "checkpoints") => void
+  onTogglePanel: (panel: "memory" | "task" | "playbooks" | "checkpoints" | "think" | "tools") => void
   onCollaborationModeChange: (mode: CollaborationMode) => void
 }
 
@@ -51,6 +53,8 @@ export default function InputBar({
   isTaskPanelExpanded,
   isPlaybooksPanelExpanded,
   isCheckpointsPanelExpanded,
+  isThinkPanelExpanded,
+  isToolsPanelExpanded,
   memoriesCount,
   tasksCount,
   tasksCompletedCount,
@@ -225,14 +229,14 @@ export default function InputBar({
                 isTaskPanelExpanded={isTaskPanelExpanded}
                 isPlaybooksPanelExpanded={isPlaybooksPanelExpanded}
                 isCheckpointsPanelExpanded={isCheckpointsPanelExpanded}
+                isThinkPanelExpanded={isThinkPanelExpanded}
+                isToolsPanelExpanded={isToolsPanelExpanded}
                 memoriesCount={memoriesCount}
                 tasksCount={tasksCount}
                 tasksCompletedCount={tasksCompletedCount}
                 checkpointsCount={checkpointsCount}
                 collaborationMode={collaborationMode}
                 onToggleButton={toggleButton}
-                onThinkLevelChange={handleThinkLevelChange}
-                onToolsChange={handleToolsChange}
                 onTogglePanel={onTogglePanel}
                 onCollaborationModeChange={onCollaborationModeChange}
               />

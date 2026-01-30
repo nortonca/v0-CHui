@@ -1,10 +1,8 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { NotebookPen, ListTodo, BookOpen, History, Brain } from "lucide-react"
+import { NotebookPen, ListTodo, BookOpen, History, Brain, Wrench } from "lucide-react"
 import ImageButton from "../buttons/image-button"
-import ThinkButton, { type ThinkLevel } from "../buttons/think-button"
-import ToolsButton from "../buttons/tools-button"
 import CollaborationModeToggle, { type CollaborationMode } from "../collaboration-mode"
 import type { ActiveButtonState } from "../types"
 
@@ -15,16 +13,18 @@ interface InputControlsProps {
   isTaskPanelExpanded: boolean
   isPlaybooksPanelExpanded: boolean
   isCheckpointsPanelExpanded: boolean
+  isThinkPanelExpanded: boolean
+  isToolsPanelExpanded: boolean
   memoriesCount: number
   tasksCount: number
   tasksCompletedCount: number
   checkpointsCount: number
   collaborationMode: CollaborationMode
   onToggleButton: (button: keyof ActiveButtonState) => void
-  onThinkLevelChange: (level: ThinkLevel) => void
-  onToolsChange: (tools: string[]) => void
-  onTogglePanel: (panel: "memory" | "task" | "playbooks" | "checkpoints") => void
+  onTogglePanel: (panel: "memory" | "task" | "playbooks" | "checkpoints" | "think" | "tools") => void
   onCollaborationModeChange: (mode: CollaborationMode) => void
+  onThinkLevelChange: (level: number) => void
+  onToolsChange: (tools: string[]) => void
 }
 
 export default function InputControls({
@@ -34,17 +34,20 @@ export default function InputControls({
   isTaskPanelExpanded,
   isPlaybooksPanelExpanded,
   isCheckpointsPanelExpanded,
+  isThinkPanelExpanded,
+  isToolsPanelExpanded,
   memoriesCount,
   tasksCount,
   tasksCompletedCount,
   checkpointsCount,
   collaborationMode,
   onToggleButton,
-  onThinkLevelChange,
-  onToolsChange,
   onTogglePanel,
   onCollaborationModeChange,
 }: InputControlsProps) {
+  const isThinkActive = activeButtons.thinkLevel !== "off"
+  const hasToolsSelected = activeButtons.selectedTools.length > 0
+
   return (
     <div className="flex items-center gap-1.5 overflow-x-auto">
       <ImageButton
@@ -53,17 +56,47 @@ export default function InputControls({
         isStreaming={isStreaming}
       />
 
-      <ThinkButton
-        thinkLevel={activeButtons.thinkLevel}
-        onLevelChange={onThinkLevelChange}
-        isStreaming={isStreaming}
-      />
+      {/* Think Toggle Button */}
+      <button
+        type="button"
+        onClick={() => onTogglePanel("think")}
+        className={cn(
+          "rounded-full h-8 px-2.5 flex items-center border border-border gap-1 transition-colors bg-background",
+          isThinkPanelExpanded && "bg-primary/10 border-primary/20",
+          isThinkActive && !isThinkPanelExpanded && "border-primary/50"
+        )}
+        disabled={isStreaming}
+        aria-label="Toggle think mode"
+        title="Think Mode"
+      >
+        <Brain className={cn("h-4 w-4 text-muted-foreground", (isThinkPanelExpanded || isThinkActive) && "text-primary")} />
+        {isThinkActive && (
+          <span className={cn("text-xs font-medium capitalize", isThinkPanelExpanded ? "text-primary" : "text-muted-foreground")}>
+            {activeButtons.thinkLevel}
+          </span>
+        )}
+      </button>
 
-      <ToolsButton
-        selectedTools={activeButtons.selectedTools}
-        onToolsChange={onToolsChange}
-        isStreaming={isStreaming}
-      />
+      {/* Tools Toggle Button */}
+      <button
+        type="button"
+        onClick={() => onTogglePanel("tools")}
+        className={cn(
+          "rounded-full h-8 px-2.5 flex items-center border border-border gap-1 transition-colors bg-background",
+          isToolsPanelExpanded && "bg-primary/10 border-primary/20",
+          hasToolsSelected && !isToolsPanelExpanded && "border-primary/50"
+        )}
+        disabled={isStreaming}
+        aria-label="Toggle tools"
+        title="Tools"
+      >
+        <Wrench className={cn("h-4 w-4 text-muted-foreground", (isToolsPanelExpanded || hasToolsSelected) && "text-primary")} />
+        {hasToolsSelected && (
+          <span className={cn("text-xs font-medium", isToolsPanelExpanded ? "text-primary" : "text-muted-foreground")}>
+            {activeButtons.selectedTools.length}
+          </span>
+        )}
+      </button>
 
       {/* Divider */}
       <div className="w-px h-5 bg-border mx-1" />
