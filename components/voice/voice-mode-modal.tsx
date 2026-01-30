@@ -1,11 +1,10 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { Canvas } from "@react-three/fiber"
 import { ParticleSphere } from "./particle-sphere"
 import { AudioAnalyzer } from "@/lib/audio-analyzer"
-import { X, Mic, MicOff } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { X, Mic, Square, Keyboard } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface VoiceModeModalProps {
@@ -17,53 +16,17 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
   const [animationState, setAnimationState] = useState<"paused" | "breathing" | "audio-reactive">("breathing")
   const [isListening, setIsListening] = useState(false)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [statusText, setStatusText] = useState("Tap to start speaking")
   const audioAnalyzerRef = useRef<AudioAnalyzer | null>(null)
   const audioContextRef = useRef<AudioContext | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
   useEffect(() => {
-    // Check for reduced motion preference
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
     setPrefersReducedMotion(mediaQuery.matches)
   }, [])
 
-  useEffect(() => {
-    if (isOpen) {
-      // Lock body scroll
-      document.body.style.overflow = "hidden"
-    } else {
-      // Unlock body scroll
-      document.body.style.overflow = ""
-      // Stop listening when modal closes
-      stopListening()
-    }
-
-    return () => {
-      document.body.style.overflow = ""
-      stopListening()
-    }
-  }, [isOpen])
-
-  const startListening = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      streamRef.current = stream
-      
-      const audioContext = new AudioContext()
-      audioContextRef.current = audioContext
-      
-      audioAnalyzerRef.current = new AudioAnalyzer(audioContext, stream)
-      setAnimationState("audio-reactive")
-      setIsListening(true)
-      
-      console.log("[v0] Voice mode activated")
-    } catch (error) {
-      console.error("[v0] Microphone access denied:", error)
-      alert("Microphone access is required for voice mode. Please grant permission and try again.")
-    }
-  }
-
-  const stopListening = () => {
+  const stopListening = useCallback(() => {
     if (audioAnalyzerRef.current) {
       audioAnalyzerRef.current.disconnect()
       audioAnalyzerRef.current = null
@@ -81,10 +44,62 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
     
     setAnimationState("breathing")
     setIsListening(false)
-    console.log("[v0] Voice mode deactivated")
+    setStatusText("Tap to start speaking")
+  }, [])
+
+  const handleClose = useCallback(() => {
+    stopListening()
+    onClose()
+  }, [stopListening, onClose])
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden"
+      
+      // Handle escape key
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          handleClose()
+        }
+      }
+      window.addEventListener("keydown", handleKeyDown)
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown)
+        document.body.style.overflow = ""
+        stopListening()
+      }
+    } else {
+      document.body.style.overflow = ""
+      stopListening()
+    }
+  }, [isOpen, stopListening, handleClose])
+
+  const startListening = async () => {
+    try {
+      setStatusText("Requesting microphone access...")
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      streamRef.current = stream
+      
+      const audioContext = new AudioContext()
+      audioContextRef.current = audioContext
+      
+      audioAnalyzerRef.current = new AudioAnalyzer(audioContext, stream)
+      setAnimationState("audio-reactive")
+      setIsListening(true)
+      setStatusText("Listening...")
+    } catch (error) {
+      console.error("Microphone access denied:", error)
+      setStatusText("Microphone access denied")
+      setTimeout(() => setStatusText("Tap to start speaking"), 2000)
+    }
   }
 
   const toggleListening = () => {
+    // Add haptic feedback
+    if (navigator.vibrate) {
+      navigator.vibrate(50)
+    }
+    
     if (isListening) {
       stopListening()
     } else {
@@ -95,28 +110,59 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-fadeIn"
-        onClick={onClose}
+        className="absolute inset-0 bg-background/95 backdrop-blur-md animate-fadeIn"
+        onClick={handleClose}
+        aria-hidden="true"
       />
 
-      {/* Modal */}
-      <div className="relative w-full h-full max-w-2xl max-h-[600px] bg-gradient-to-b from-background/95 to-background/90 rounded-3xl shadow-2xl overflow-hidden animate-scaleIn border border-border/50">
-        {/* Close button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-4 right-4 z-10 rounded-full bg-background/50 hover:bg-background/80 backdrop-blur-sm"
-          onClick={onClose}
-        >
-          <X className="h-5 w-5 text-foreground" />
-          <span className="sr-only">Close</span>
-        </Button>
+      {/* Modal Container */}
+      <div 
+        className={cn(
+          "relative w-full max-w-lg h-full max-h-[680px]",
+          "bg-card border border-border rounded-3xl shadow-2xl overflow-hidden",
+          "animate-scaleIn flex flex-col"
+        )}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="voice-modal-title"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/80 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "w-2 h-2 rounded-full",
+              isListening ? "bg-primary animate-pulse" : "bg-muted-foreground"
+            )} />
+            <h2 id="voice-modal-title" className="text-lg font-semibold text-foreground">
+              Voice Mode
+            </h2>
+          </div>
+          <button
+            onClick={handleClose}
+            className="p-2 -mr-2 hover:bg-muted rounded-xl transition-colors"
+            aria-label="Close voice mode"
+          >
+            <X className="size-5 text-muted-foreground" />
+          </button>
+        </div>
 
-        {/* 3D Canvas */}
-        <div className="absolute inset-0 bg-gradient-radial from-primary/5 via-transparent to-transparent">
+        {/* 3D Visualization Area */}
+        <div className="relative flex-1 min-h-0">
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-card/50 pointer-events-none z-10" />
+          
+          {/* Radial glow effect */}
+          <div className={cn(
+            "absolute inset-0 transition-opacity duration-500",
+            isListening ? "opacity-100" : "opacity-40"
+          )}>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
+          </div>
+
+          {/* Canvas */}
           <Canvas camera={{ position: [0, 0, 15], fov: 60 }}>
             <ParticleSphere
               animationState={animationState}
@@ -126,58 +172,63 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
           </Canvas>
         </div>
 
-        {/* Content overlay */}
-        <div className="relative z-10 h-full flex flex-col items-center justify-between p-8">
-          {/* Top section */}
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <h2 className="text-3xl font-semibold text-foreground">Voice Mode</h2>
-              <p className="text-muted-foreground max-w-md">
-                {isListening 
-                  ? "Listening... Speak now and watch the particles react to your voice."
-                  : "Tap the microphone button to start voice mode and see the visualization react to your voice."
-                }
-              </p>
-            </div>
-          </div>
+        {/* Controls Footer */}
+        <div className="px-6 py-6 border-t border-border bg-card/80 backdrop-blur-sm">
+          {/* Status text */}
+          <p className="text-sm text-center text-muted-foreground mb-5">
+            {statusText}
+          </p>
 
-          {/* Bottom controls */}
-          <div className="flex flex-col items-center gap-6">
-            {/* Microphone button */}
+          {/* Control buttons */}
+          <div className="flex items-center justify-center gap-4">
+            {/* Switch to keyboard button */}
+            <button
+              onClick={handleClose}
+              className={cn(
+                "flex items-center justify-center w-12 h-12 rounded-full",
+                "bg-muted hover:bg-muted/80 transition-all duration-200",
+                "text-muted-foreground hover:text-foreground"
+              )}
+              aria-label="Switch to keyboard"
+            >
+              <Keyboard className="size-5" />
+            </button>
+
+            {/* Main microphone button */}
             <button
               onClick={toggleListening}
               className={cn(
-                "relative w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg",
+                "relative flex items-center justify-center w-16 h-16 rounded-full",
+                "transition-all duration-300 shadow-lg",
                 isListening
-                  ? "bg-primary hover:bg-primary/90 scale-110"
-                  : "bg-muted hover:bg-muted/80"
+                  ? "bg-primary hover:bg-primary/90 scale-105"
+                  : "bg-primary/10 hover:bg-primary/20 border-2 border-primary"
               )}
+              aria-label={isListening ? "Stop listening" : "Start listening"}
             >
               {isListening ? (
-                <Mic className="h-8 w-8 text-primary-foreground" />
+                <Square className="size-6 text-primary-foreground" fill="currentColor" />
               ) : (
-                <MicOff className="h-8 w-8 text-muted-foreground" />
+                <Mic className="size-6 text-primary" />
               )}
               
-              {/* Pulse animation when listening */}
+              {/* Ripple effect when listening */}
               {isListening && (
                 <>
-                  <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-20" />
-                  <span className="absolute inset-0 rounded-full bg-primary animate-pulse opacity-30" />
+                  <span className="absolute inset-0 rounded-full bg-primary/30 animate-ping" />
+                  <span className="absolute -inset-2 rounded-full border-2 border-primary/20 animate-pulse" />
                 </>
               )}
             </button>
 
-            {/* Status text */}
-            <div className="text-center">
-              <p className="text-sm font-medium text-foreground">
-                {isListening ? "Listening" : "Tap to speak"}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {isListening ? "Voice mode active" : "Voice mode inactive"}
-              </p>
-            </div>
+            {/* Placeholder for symmetry */}
+            <div className="w-12 h-12" />
           </div>
+
+          {/* Keyboard hint */}
+          <p className="text-xs text-center text-muted-foreground mt-5">
+            Press <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">Esc</kbd> to close
+          </p>
         </div>
       </div>
     </div>
