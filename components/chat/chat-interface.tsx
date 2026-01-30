@@ -544,8 +544,8 @@ export default function ChatInterface() {
         activityCount={activities.filter(a => a.type === "thinking" || a.type === "searching" || a.type === "writing").length}
       />
 
-      <div ref={chatContainerRef} className="flex-grow pb-32 pt-12 px-4 overflow-y-auto">
-        <div className="max-w-3xl mx-auto space-y-4">
+      <div ref={chatContainerRef} className="flex-grow pb-48 sm:pb-40 pt-12 overflow-y-auto">
+        <div className="max-w-3xl mx-auto">
           {messageSections.map((section, sectionIndex) => (
             <MessageSectionComponent
               key={section.id}
