@@ -157,9 +157,12 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
           {/* Radial glow effect */}
           <div className={cn(
             "absolute inset-0 transition-opacity duration-500",
-            isListening ? "opacity-100" : "opacity-40"
+            isListening ? "opacity-100" : "opacity-60"
           )}>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-primary/20 rounded-full blur-3xl" />
+            {isListening && (
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+            )}
           </div>
 
           {/* Canvas */}
@@ -202,21 +205,21 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
                 "transition-all duration-300 shadow-lg",
                 isListening
                   ? "bg-primary hover:bg-primary/90 scale-105"
-                  : "bg-primary/10 hover:bg-primary/20 border-2 border-primary"
+                  : "bg-primary hover:bg-primary/90"
               )}
               aria-label={isListening ? "Stop listening" : "Start listening"}
             >
               {isListening ? (
-                <Square className="size-6 text-primary-foreground" fill="currentColor" />
+                <Square className="size-6 text-white" fill="currentColor" />
               ) : (
-                <Mic className="size-6 text-primary" />
+                <Mic className="size-6 text-white" />
               )}
               
               {/* Ripple effect when listening */}
               {isListening && (
                 <>
-                  <span className="absolute inset-0 rounded-full bg-primary/30 animate-ping" />
-                  <span className="absolute -inset-2 rounded-full border-2 border-primary/20 animate-pulse" />
+                  <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
+                  <span className="absolute -inset-2 rounded-full border-2 border-primary animate-pulse" />
                 </>
               )}
             </button>
