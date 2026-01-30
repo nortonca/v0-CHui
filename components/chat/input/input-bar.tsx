@@ -200,12 +200,12 @@ export default function InputBar({
         <div
           ref={inputContainerRef}
           className={cn(
-            "relative w-full rounded-3xl border border-border bg-card p-3 cursor-text",
+            "relative w-full rounded-3xl border border-border bg-card p-3 cursor-text overflow-visible",
             isStreaming && "opacity-80",
           )}
           onClick={handleInputContainerClick}
         >
-          <div className="pb-9">
+          <div className="pb-12">
             <TextareaInput
               textareaRef={textareaRef}
               inputValue={inputValue}
@@ -216,7 +216,7 @@ export default function InputBar({
             />
           </div>
 
-          <div className="absolute bottom-3 left-3 right-3">
+          <div className="absolute bottom-3 left-3 right-3 z-10">
             <div className="flex items-center justify-between">
               <InputControls
                 activeButtons={activeButtons}

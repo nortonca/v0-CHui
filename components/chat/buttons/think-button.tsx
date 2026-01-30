@@ -66,11 +66,12 @@ export default function ThinkButton({
       {isOpen && (
         <div
           className={cn(
-            "absolute bottom-full left-0 mb-2 z-50",
+            "absolute bottom-full left-0 mb-2",
             "bg-card border border-border rounded-2xl shadow-xl",
             "w-72 overflow-hidden",
             "animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2"
           )}
+          style={{ zIndex: 9999 }}
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
         >
