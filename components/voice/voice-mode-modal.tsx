@@ -121,8 +121,8 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
       {/* Modal Container */}
       <div 
         className={cn(
-          "relative w-full max-w-lg h-full max-h-[680px]",
-          "bg-card border border-border rounded-3xl shadow-2xl overflow-hidden",
+          "relative w-full max-w-md h-auto max-h-[calc(100vh-4rem)] md:max-h-[560px]",
+          "bg-card border border-border rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden",
           "animate-scaleIn flex flex-col"
         )}
         role="dialog"
@@ -130,7 +130,7 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
         aria-labelledby="voice-modal-title"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-card/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4 border-b border-border bg-card">
           <div className="flex items-center gap-3">
             <div className={cn(
               "w-2 h-2 rounded-full",
@@ -150,21 +150,7 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
         </div>
 
         {/* 3D Visualization Area */}
-        <div className="relative flex-1 min-h-0">
-          {/* Subtle gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-card/50 pointer-events-none z-10" />
-          
-          {/* Radial glow effect */}
-          <div className={cn(
-            "absolute inset-0 transition-opacity duration-500",
-            isListening ? "opacity-100" : "opacity-60"
-          )}>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-primary/20 rounded-full blur-3xl" />
-            {isListening && (
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-            )}
-          </div>
-
+        <div className="relative flex-1 min-h-0 min-h-[200px]">
           {/* Canvas */}
           <Canvas camera={{ position: [0, 0, 15], fov: 60 }}>
             <ParticleSphere
@@ -176,7 +162,7 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
         </div>
 
         {/* Controls Footer */}
-        <div className="px-6 py-6 border-t border-border bg-card/80 backdrop-blur-sm">
+        <div className="px-4 py-5 md:px-6 md:py-6 border-t border-border bg-card">
           {/* Status text */}
           <p className="text-sm text-center text-muted-foreground mb-5">
             {statusText}
@@ -201,11 +187,10 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
             <button
               onClick={toggleListening}
               className={cn(
-                "relative flex items-center justify-center w-16 h-16 rounded-full",
-                "transition-all duration-300 shadow-lg",
-                isListening
-                  ? "bg-primary hover:bg-primary/90 scale-105"
-                  : "bg-primary hover:bg-primary/90"
+                "flex items-center justify-center w-16 h-16 rounded-full",
+                "transition-all duration-200 shadow-lg",
+                "bg-primary hover:bg-primary/90",
+                isListening && "scale-105"
               )}
               aria-label={isListening ? "Stop listening" : "Start listening"}
             >
@@ -213,11 +198,6 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
                 <Square className="size-6 text-white" fill="currentColor" />
               ) : (
                 <Mic className="size-6 text-white" />
-              )}
-              
-              {/* Ripple effect when listening */}
-              {isListening && (
-                <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-20" />
               )}
             </button>
 
