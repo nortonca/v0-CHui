@@ -110,7 +110,7 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8">
+    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center pt-14 pb-4 px-4 md:p-8">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-background/95 backdrop-blur-md animate-fadeIn"
@@ -121,7 +121,7 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
       {/* Modal Container */}
       <div 
         className={cn(
-          "relative w-full max-w-md h-auto max-h-[calc(100vh-4rem)] md:max-h-[560px]",
+          "relative w-full max-w-md h-full max-h-[calc(100vh-5rem)] md:max-h-[600px]",
           "bg-card border border-border rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden",
           "animate-scaleIn flex flex-col"
         )}
