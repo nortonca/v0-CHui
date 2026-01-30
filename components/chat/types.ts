@@ -1,9 +1,10 @@
 export interface ActiveButtonState {
   add: boolean
-  deepSearch: boolean
-  think: boolean
+  tools: boolean
+  thinkLevel: "off" | "low" | "medium" | "high"
   image: boolean
   browser: boolean
+  selectedTools: string[]
 }
 export type MessageType = "user" | "system"
 

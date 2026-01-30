@@ -14,10 +14,11 @@ export default function ChatInterface() {
   const newSectionRef = useRef<HTMLDivElement>(null)
   const [activeButtons, setActiveButtons] = useState<ActiveButtonState>({
     add: false,
-    deepSearch: false,
-    think: false,
+    tools: false,
+    thinkLevel: "off",
     image: false,
     browser: false,
+    selectedTools: [],
   })
   const [isMobile, setIsMobile] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])

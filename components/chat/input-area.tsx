@@ -2,6 +2,7 @@
 
 import type React from "react"
 import MicrophoneButton from "./buttons/microphone-button" // Import MicrophoneButton
+import SearchButton from "./buttons/search-button" // Import SearchButton
 
 import { useState, useRef } from "react"
 import { cn } from "@/lib/utils"
@@ -9,7 +10,7 @@ import type { ActiveButtonState, UploadedImage } from "./types"
 import ImageUpload from "./image-upload"
 import TextareaInput from "./textarea-input"
 import ImageButton from "./buttons/image-button"
-import SearchButton from "./buttons/search-button"
+import ToolsButton from "./buttons/tools-button"
 import ThinkButton from "./buttons/think-button"
 import VoiceToggleButton from "./buttons/voice-toggle-button"
 import SendButton from "./buttons/send-button"
@@ -207,24 +208,45 @@ export default function InputArea({
           <div className="absolute bottom-3 left-3 right-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                {/* Update the button components to use the new activeButtons state */}
                 <ImageButton
                   isActive={activeButtons.image}
                   toggleButton={() => toggleButton("image")}
                   isStreaming={isStreaming}
                 />
 
-                <SearchButton
-                  isActive={activeButtons.deepSearch}
-                  toggleButton={() => toggleButton("deepSearch")}
+                <ThinkButton
+                  thinkLevel={activeButtons.thinkLevel}
+                  onLevelChange={(level) => {
+                    saveSelectionState()
+                    setActiveButtons((prev) => ({ ...prev, thinkLevel: level }))
+                    setTimeout(() => restoreSelectionState(), 0)
+                  }}
                   isStreaming={isStreaming}
                 />
 
-                <ThinkButton
-                  isActive={activeButtons.think}
-                  toggleButton={() => toggleButton("think")}
+                <ToolsButton
+                  selectedTools={activeButtons.selectedTools}
+                  onToolsChange={(tools) => {
+                    saveSelectionState()
+                    setActiveButtons((prev) => ({ ...prev, selectedTools: tools }))
+                    setTimeout(() => restoreSelectionState(), 0)
+                  }}
                   isStreaming={isStreaming}
                 />
+
+                {/* Display selected tools as chips */}
+                {activeButtons.selectedTools.length > 0 && (
+                  <div className="flex items-center gap-1.5 ml-2">
+                    {activeButtons.selectedTools.map((tool) => (
+                      <span
+                        key={tool}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium"
+                      >
+                        {tool}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center space-x-2">
