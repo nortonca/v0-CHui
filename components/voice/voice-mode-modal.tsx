@@ -217,10 +217,7 @@ export default function VoiceModeModal({ isOpen, onClose }: VoiceModeModalProps)
               
               {/* Ripple effect when listening */}
               {isListening && (
-                <>
-                  <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-75" />
-                  <span className="absolute -inset-2 rounded-full border-2 border-primary animate-pulse" />
-                </>
+                <span className="absolute inset-0 rounded-full bg-primary animate-ping opacity-20" />
               )}
             </button>
 
