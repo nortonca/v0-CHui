@@ -5,6 +5,7 @@ import { X, Settings, History, Sparkles, HelpCircle, User, Plug } from "lucide-r
 import { cn } from "@/lib/utils"
 import { useModal } from "@/components/providers/modal-provider"
 import ToolsModalContent from "@/components/tools/tools-modal-content"
+import SettingsModalContent from "@/components/settings/settings-modal-content"
 
 interface MenuModalContentProps {
   onClose: () => void
@@ -15,6 +16,10 @@ export default function MenuModalContent({ onClose }: MenuModalContentProps) {
 
   const handleOpenTools = () => {
     openModal("tools", <ToolsModalContent onClose={() => closeModal("tools")} />, () => {})
+  }
+
+  const handleOpenSettings = () => {
+    openModal("settings", <SettingsModalContent onClose={() => closeModal("settings")} />, () => {})
   }
 
   return (
@@ -85,10 +90,7 @@ export default function MenuModalContent({ onClose }: MenuModalContentProps) {
               icon={<Settings className="size-5" />}
               label="Settings"
               description="Customize your experience"
-              onClick={() => {
-                console.log("[v0] Settings clicked")
-                onClose()
-              }}
+              onClick={handleOpenSettings}
             />
             <MenuButton
               icon={<HelpCircle className="size-5" />}
