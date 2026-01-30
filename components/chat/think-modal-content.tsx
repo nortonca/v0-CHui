@@ -46,69 +46,71 @@ export default function ThinkModalContent({
   }
 
   return (
-    <div className="w-full max-w-md bg-background rounded-3xl border border-border shadow-2xl">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-border">
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <Brain className="size-5 text-primary" />
+    <div className="flex items-center justify-center h-full p-4">
+      <div className="w-full max-w-md bg-card rounded-3xl border border-border shadow-2xl animate-scaleIn">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-border">
+          <div className="flex items-center gap-3">
+            <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Brain className="size-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Think Mode</h2>
+              <p className="text-sm text-muted-foreground">Choose reasoning level</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Think Mode</h2>
-            <p className="text-sm text-muted-foreground">Choose reasoning level</p>
-          </div>
+          <button
+            onClick={onClose}
+            className={cn(
+              "size-8 rounded-full flex items-center justify-center",
+              "hover:bg-muted transition-colors"
+            )}
+          >
+            <X className="size-4 text-muted-foreground" />
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          className={cn(
-            "size-8 rounded-full flex items-center justify-center",
-            "hover:bg-muted transition-colors"
-          )}
-        >
-          <X className="size-4 text-muted-foreground" />
-        </button>
-      </div>
 
-      {/* Content */}
-      <div className="p-6 space-y-3">
-        {THINK_LEVELS.map((level) => {
-          const Icon = level.icon
-          const isSelected = currentLevel === level.id
+        {/* Content */}
+        <div className="p-6 space-y-3">
+          {THINK_LEVELS.map((level) => {
+            const Icon = level.icon
+            const isSelected = currentLevel === level.id
 
-          return (
-            <button
-              key={level.id}
-              onClick={() => handleSelect(level.id)}
-              className={cn(
-                "w-full p-4 rounded-xl text-left transition-all",
-                "border-2 hover:border-primary/50",
-                isSelected 
-                  ? "border-primary bg-primary/5" 
-                  : "border-border bg-card hover:bg-muted/50"
-              )}
-            >
-              <div className="flex items-start gap-3">
-                <div className={cn(
-                  "size-10 rounded-lg flex items-center justify-center flex-shrink-0",
-                  isSelected ? "bg-primary/10" : "bg-muted"
-                )}>
-                  <Icon className={cn("size-5", isSelected ? level.color : "text-muted-foreground")} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-foreground">{level.label}</span>
-                    {isSelected && (
-                      <div className="size-2 rounded-full bg-primary" />
-                    )}
+            return (
+              <button
+                key={level.id}
+                onClick={() => handleSelect(level.id)}
+                className={cn(
+                  "w-full p-4 rounded-xl text-left transition-all",
+                  "border-2 hover:border-primary/50",
+                  isSelected 
+                    ? "border-primary bg-primary/5" 
+                    : "border-border bg-card hover:bg-muted/50"
+                )}
+              >
+                <div className="flex items-start gap-3">
+                  <div className={cn(
+                    "size-10 rounded-lg flex items-center justify-center flex-shrink-0",
+                    isSelected ? "bg-primary/10" : "bg-muted"
+                  )}>
+                    <Icon className={cn("size-5", isSelected ? level.color : "text-muted-foreground")} />
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    {level.description}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-foreground">{level.label}</span>
+                      {isSelected && (
+                        <div className="size-2 rounded-full bg-primary" />
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {level.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </button>
-          )
+              </button>
+            )
         })}
+      </div>
       </div>
     </div>
   )
