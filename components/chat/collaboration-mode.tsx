@@ -41,29 +41,34 @@ export default function CollaborationModeToggle({
   isCompact = false,
 }: CollaborationModeProps) {
   return (
-    <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/50 border border-border">
-      {MODES.map((m) => {
-        const Icon = m.icon
-        const isActive = mode === m.id
+    <div className="flex flex-col gap-1.5">
+      <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide px-1">
+        Mode
+      </div>
+      <div className="flex items-center gap-1 p-1 rounded-xl bg-muted/50 border border-border">
+        {MODES.map((m) => {
+          const Icon = m.icon
+          const isActive = mode === m.id
 
-        return (
-          <button
-            key={m.id}
-            type="button"
-            onClick={() => onModeChange(m.id)}
-            className={cn(
-              "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all text-xs font-medium",
-              isActive
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-            title={m.description}
-          >
-            <Icon className="size-3.5" />
-            {!isCompact && <span>{m.shortLabel}</span>}
-          </button>
-        )
-      })}
+          return (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => onModeChange(m.id)}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all text-xs font-medium whitespace-nowrap",
+                isActive
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              title={m.description}
+            >
+              <Icon className="size-3.5" />
+              <span>{m.shortLabel}</span>
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }
