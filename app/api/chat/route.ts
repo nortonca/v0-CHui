@@ -1,22 +1,22 @@
-import { fireworks } from '@ai-sdk/fireworks';
 import { streamText } from 'ai';
+import { createGroq } from '@ai-sdk/groq';
 
 export const runtime = 'edge';
+
+// Initialize Groq client
+const groq = createGroq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 /**
  * Chat API endpoint
  * 
- * Handles streaming chat completions using Fireworks AI (Kimi 2.5).
- * This endpoint:
- * - Accepts messages from the UI
- * - Streams responses back in real-time
- * - Maintains conversation context
+ * Handles streaming chat completions using Groq (llama-3.3-70b-versatile).
+ * Fast inference with streaming responses.
  */
 export async function POST(request: Request) {
   try {
     const { messages } = await request.json();
-
-    console.log('[v0] Chat API: Received', messages?.length || 0, 'messages');
 
     // Validate messages
     if (!messages || !Array.isArray(messages)) {
@@ -26,9 +26,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Stream response using the agent (don't await streamText)
+    // Stream response using Groq
     const result = streamText({
-      model: fireworks('accounts/fireworks/models/kimi-k2p5'),
+      model: groq('llama-3.3-70b-versatile'),
       messages,
       system: `You are a helpful, professional AI assistant integrated into a modern chat application.
 
@@ -37,12 +37,6 @@ Core Characteristics:
 - Concise but thorough responses
 - Technically competent across general topics
 - Honest about limitations
-
-Boundaries:
-- You are currently a conversational assistant
-- You do not yet have access to tools, memory persistence, or external data
-- If asked about capabilities you don't have, politely explain and offer to help in other ways
-- Never hallucinate features or abilities
 
 Communication Style:
 - Be direct and clear
