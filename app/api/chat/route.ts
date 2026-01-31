@@ -26,8 +26,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Stream response using the agent
-    const result = await streamText({
+    // Stream response using the agent (don't await streamText)
+    const result = streamText({
       model: fireworks('accounts/fireworks/models/kimi-k2p5'),
       messages,
       system: `You are a helpful, professional AI assistant integrated into a modern chat application.
@@ -53,7 +53,7 @@ Communication Style:
 Your goal is to be genuinely helpful while maintaining clarity about your current capabilities.`,
     });
 
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error('[v0] Chat API error:', error);
     

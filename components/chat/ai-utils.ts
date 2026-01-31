@@ -39,41 +39,17 @@ export async function* streamAIResponse(
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
-    let buffer = '';
 
     while (true) {
       const { done, value } = await reader.read();
       
       if (done) break;
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (!line.trim()) continue;
-        
-        // AI SDK v6 uses different data stream format
-        // Lines are prefixed with data type codes like "0:", "2:", etc.
-        try {
-          // Handle different line formats
-          if (line.startsWith('0:')) {
-            // Text delta
-            const data = line.slice(2);
-            yield data;
-          } else if (line.startsWith('2:')) {
-            // Additional data (might contain text)
-            const jsonStr = line.slice(2);
-            const parsed = JSON.parse(jsonStr);
-            if (typeof parsed === 'string') {
-              yield parsed;
-            }
-          }
-          // Other prefixes (1:, 8:, 9:, etc.) are for metadata, tool calls, etc.
-        } catch (e) {
-          // Skip malformed lines
-          console.warn('[v0] Failed to parse stream line:', line.substring(0, 50));
-        }
+      // AI SDK v6 toTextStreamResponse() returns plain text chunks
+      // No special formatting, just decode and yield
+      const chunk = decoder.decode(value, { stream: true });
+      if (chunk) {
+        yield chunk;
       }
     }
   } catch (error) {
